@@ -36,6 +36,11 @@ to anchor each creative to the real garment.
 - **Plaid dress** (seedance_2_0): https://d8j0ntlcm91z4.cloudfront.net/user_3F1O6weMRqXr9LfttZOeEzhHpcP/hf_20260615_113120_bd24d501-23bd-4f1f-a8d7-d6ffb1a88dda.mp4
 - **White set** (seedance_2_0, waist-up framing): https://d8j0ntlcm91z4.cloudfront.net/user_3F1O6weMRqXr9LfttZOeEzhHpcP/hf_20260615_114632_c0f4aa7a-1264-471a-af4a-619132d3087c.mp4 — earlier full-body attempts were blocked by the content filter due to the bare-leg short-shorts framing, so this uses a waist-up crop.
 
+## Long-form reel (seedance_2_0, 9:16, 10s, with audio)
+
+- **Plaid dress** — walk-in → pose → slow twirl → smile, cinematic push-in:
+  https://d8j0ntlcm91z4.cloudfront.net/user_3F1O6weMRqXr9LfttZOeEzhHpcP/hf_20260615_120211_01f065b0-ab97-4964-bab0-1093083a1eb1.mp4
+
 ## Notes
 
 - Result URLs are public Higgsfield CDN links.

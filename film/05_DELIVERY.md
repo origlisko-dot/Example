@@ -25,7 +25,7 @@
 ### ACT II — RECOGNITION
 8. **4.1 — The lengthening hallway** · https://d8j0ntlcm91z4.cloudfront.net/user_3F1O6weMRqXr9LfttZOeEzhHpcP/hf_20260627_204947_22e264fd-6e2c-4936-a86b-24583fe9bace.mp4
 9. **4.4 — Breathing behind her** · https://d8j0ntlcm91z4.cloudfront.net/user_3F1O6weMRqXr9LfttZOeEzhHpcP/hf_20260627_204949_a657823c-dfb6-4bb7-bc74-e361e5c2b23d.mp4
-10. **4.5 — The vision in the glass** · _rendering — job `58ce1512-abaf-4ff3-b400-13f72a679604`_
+10. **4.5 — The vision in the glass** · https://d8j0ntlcm91z4.cloudfront.net/user_3F1O6weMRqXr9LfttZOeEzhHpcP/hf_20260627_205222_58ce1512-abaf-4ff3-b400-13f72a679604.mp4
 
 ### ACT II — POSSESSION
 11. **5.4 — The black eyes** *(VO-4)* · https://d8j0ntlcm91z4.cloudfront.net/user_3F1O6weMRqXr9LfttZOeEzhHpcP/hf_20260627_204954_e5e63243-bc39-42ae-b4e9-da27704274ea.mp4
@@ -41,14 +41,14 @@
 17. **8.4 — The wall cracks open** · https://d8j0ntlcm91z4.cloudfront.net/user_3F1O6weMRqXr9LfttZOeEzhHpcP/hf_20260627_205024_a9e3f5f2-8ea5-448a-bf36-f556d664cd9b.mp4
 18. **8.6 — Samuel in the burning glass** · https://d8j0ntlcm91z4.cloudfront.net/user_3F1O6weMRqXr9LfttZOeEzhHpcP/hf_20260627_205026_98ed7fc4-9b7d-46e8-9226-922ec476bc15.mp4
 19. **8.7 — The claw from the wall** · https://d8j0ntlcm91z4.cloudfront.net/user_3F1O6weMRqXr9LfttZOeEzhHpcP/hf_20260627_205029_80b37dd8-2f7c-4d97-a94f-2dac5ba7ad4b.mp4
-20. **8.8 — Daniel's jaw unhinges** · _rendering — job `b03cdd84-0973-4b43-88c2-a702fe6f6bc6`_
-21. **8.10 — The mirror shatters** *(VO-5)* · _rendering — job `5058def9-26f4-4601-abba-0fa3cc902275`_
+20. **8.8 — Daniel's jaw unhinges** · https://d8j0ntlcm91z4.cloudfront.net/user_3F1O6weMRqXr9LfttZOeEzhHpcP/hf_20260627_205030_b03cdd84-0973-4b43-88c2-a702fe6f6bc6.mp4
+21. **8.10 — The mirror shatters** *(VO-5)* · https://d8j0ntlcm91z4.cloudfront.net/user_3F1O6weMRqXr9LfttZOeEzhHpcP/hf_20260627_205033_5058def9-26f4-4601-abba-0fa3cc902275.mp4
 
 ### ACT III — AFTERMATH
 22. **10.1 — The house torn down** · _rendering — job `9c6b5a33-b1a2-4cdf-ae46-50d99a23a26f`_
 23. **10.2 — The thirty-seven** · _rendering — job `4049b53a-9d7d-4221-b35b-e2bc9c7cc6e3`_
-24. **11.2 — Mara in the rain** · _rendering — job `ae2311ab-f672-4921-a8c1-614afcd00cd9`_
-25. **12.3 — The reflection whispers (END)** *(VO-6)* · _rendering — job `ac992d7e-08e4-4e82-9165-be8483c0c622`_
+24. **11.2 — Mara in the rain** · https://d8j0ntlcm91z4.cloudfront.net/user_3F1O6weMRqXr9LfttZOeEzhHpcP/hf_20260627_205040_ae2311ab-f672-4921-a8c1-614afcd00cd9.mp4
+25. **12.3 — The reflection whispers (END)** *(VO-6)* · https://d8j0ntlcm91z4.cloudfront.net/user_3F1O6weMRqXr9LfttZOeEzhHpcP/hf_20260627_205100_ac992d7e-08e4-4e82-9165-be8483c0c622.mp4
 
 ---
 

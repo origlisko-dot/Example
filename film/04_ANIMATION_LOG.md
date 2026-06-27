@@ -30,7 +30,15 @@
 | 11.2 | Mara in the rain | e7abf3ce | `ae2311ab-f672-4921-a8c1-614afcd00cd9` |
 | 12.3 | The reflection whispers (END) | 369b2b89 | `ac992d7e-08e4-4e82-9165-be8483c0c622` |
 
-## VOICE / VO TRACKS
+## AUDIO v2 — DIALOGUE-DRIVEN + SCORE (current cut)
+The first pass used a heavy narrator. The current film removes the narrator entirely
+and is **carried by in-scene character dialogue** (17 lines across the scenes), under a
+synthesized atmospheric **score bed** (low drone + wind + shimmer) that auto-ducks
+beneath speech (ffmpeg `sidechaincompress`). Voices: Mara=Quinn, Daniel=Leo,
+Father Elias=Arthur, Father (tape)=Sterling, The Entity=Cillian, Driver=Brooks,
+Reflection=Vesper. Exact lines, shots, offsets and job-ids live in `assemble_film.sh`.
+
+## VOICE / VO TRACKS (v1 — superseded by Audio v2 above)
 | Track | Speaker (voice) | Line(s) | Audio job_id |
 |-------|-----------------|---------|--------------|
 | VO-1 | Narrator (Vesper) | Opening — "The body arrived during a thunderstorm…" | `0555fe17-7641-4fea-8cf4-23388c6f86bf` |

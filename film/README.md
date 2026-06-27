@@ -26,6 +26,12 @@ Every recurring character, location, and the black mirror is a Higgsfield **Elem
 re-injected into each shot prompt — so faces (Mara, Daniel, Father Elias, Samuel…),
 the sets, and the cursed mirror stay consistent across all 57 shots.
 
+## Audio
+No narrator — the film is **dialogue-driven**: 17 in-scene character lines
+(`text2speech_v2_elevenlabs`, one voice per character) over a synthesized
+**score bed** (low drone + wind + shimmer) that auto-ducks under speech.
+
 ## Pipeline
 `nano_banana_pro` (57 keyframes) → `kling3_0_turbo` (25 i2v hero clips) →
-`text2speech_v2_elevenlabs` (6 voices) → `ffmpeg` edit (title + shots + VO + end card).
+`text2speech_v2_elevenlabs` (character dialogue) → `ffmpeg` (score bed + sidechain
+duck + title/shots/end-card edit). Rebuild the whole cut with `bash assemble_film.sh`.

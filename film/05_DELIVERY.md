@@ -2,10 +2,11 @@
 *A gothic horror short, built end-to-end with the **Higgsfield Connector**.*
 *All clips 1280×720, 5s, `kling3_0_turbo` image-to-video from element-driven keyframes. VO via ElevenLabs.*
 
-> **The film is already assembled** — dialogue-driven (no narrator) with a score bed.
-> Open `player.html` to watch it in a browser, or use the single file
-> `THE_LAST_BODY_AT_VALE_HOUSE.mp4` (rebuild with `bash assemble_film.sh`).
-> The individual links below are the raw source clips + voice lines, in shot order.
+> **EXTENDED CUT — 53 shots, ~4m26s** (45 animated clips + 8 macro inserts),
+> dialogue-driven (no narrator) with a score bed. Open `player.html`, or use the
+> single file `THE_LAST_BODY_AT_VALE_HOUSE.mp4` (rebuild with `bash assemble_film.sh`).
+> The full ordered shot list with all source ids lives in `assemble_film.sh`.
+> The links below are the original 25-shot core set, in shot order.
 
 ---
 

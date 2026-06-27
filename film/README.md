@@ -2,13 +2,16 @@
 A complete gothic-horror short, produced end-to-end with the **Higgsfield Connector**
 (Higgsfield AI) from the provided script.
 
-## Watch it
+## Watch it  (extended cut — 53 shots, ~4m26s)
 - **One-click web player:** open [`player.html`](player.html) in any browser → press play.
-  It streams all 25 shots in order, lays the 6 voice tracks on their beats, and
-  bookends the film with the title and end cards. ~2m20s.
-- **Single film file:** `THE_LAST_BODY_AT_VALE_HOUSE.mp4` (1280×720, ~137s) — delivered
+  It streams all 53 shots in order, lays the in-scene dialogue on its beats over a
+  looping score, and bookends the film with the title and end cards.
+- **Single film file:** `THE_LAST_BODY_AT_VALE_HOUSE.mp4` (1280×720, ~266s) — delivered
   to the requester and rebuildable any time with [`assemble_film.sh`](assemble_film.sh)
   (`bash assemble_film.sh`, needs `ffmpeg` + `curl`).
+
+The extended cut is **45 animated clips** (`kling3_0_turbo`) + **8 macro inserts**
+(Ken-Burns stills), covering every sequence of the script.
 
 ## How it was made (and how to read these docs)
 | File | What it is |
@@ -32,6 +35,7 @@ No narrator — the film is **dialogue-driven**: 17 in-scene character lines
 **score bed** (low drone + wind + shimmer) that auto-ducks under speech.
 
 ## Pipeline
-`nano_banana_pro` (57 keyframes) → `kling3_0_turbo` (25 i2v hero clips) →
-`text2speech_v2_elevenlabs` (character dialogue) → `ffmpeg` (score bed + sidechain
-duck + title/shots/end-card edit). Rebuild the whole cut with `bash assemble_film.sh`.
+`nano_banana_pro` (57 keyframes) → `kling3_0_turbo` (45 i2v clips) →
+`text2speech_v2_elevenlabs` (17 character dialogue lines) → `ffmpeg` (8 macro-insert
+stills + score bed + sidechain duck + title/shots/end-card edit).
+Rebuild the whole cut with `bash assemble_film.sh`.

@@ -30,7 +30,16 @@
 | 11.2 | Mara in the rain | e7abf3ce | `ae2311ab-f672-4921-a8c1-614afcd00cd9` |
 | 12.3 | The reflection whispers (END) | 369b2b89 | `ac992d7e-08e4-4e82-9165-be8483c0c622` |
 
-## AUDIO v2 — DIALOGUE-DRIVEN + SCORE (current cut)
+## EXTENDED CUT (current) — 53 shots
+The current film expands the original 25 hero shots to **53**: +20 newly animated
+shots (`kling3_0_turbo`) covering the van/dock, prep-room, the symbol, the kitchen
+beats, the phone call, Daniel's prayer, the priest's arrival, the bound chair, the
+descent, the cabinet, the rite, the crucifix, the dawn, the burial and the package;
+plus **8 macro inserts** (Ken-Burns stills: clasped hands, GIVE HIM BLOOD, the sigil,
+the envelope, the photograph, the cassette, the blue blanket, the wallpaper note).
+The complete ordered list with source ids + dialogue offsets is in `assemble_film.sh`.
+
+## AUDIO v2 — DIALOGUE-DRIVEN + SCORE
 The first pass used a heavy narrator. The current film removes the narrator entirely
 and is **carried by in-scene character dialogue** (17 lines across the scenes), under a
 synthesized atmospheric **score bed** (low drone + wind + shimmer) that auto-ducks

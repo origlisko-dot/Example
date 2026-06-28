@@ -3,15 +3,15 @@ set -e
 cd /tmp/claude-0/-home-user-Example/4235e897-a380-51ec-89b1-1f9b3d820cb2/scratchpad/film
 # entry: base|dlgspec|sfxspec   dlg=<key>.mp3  sfx=sfx/<key>.wav   spec="key@ms;key@ms"
 ORDER=(
- "t_title|NAR0@800|thunder@900" "prem||thunder@1800" "a1|NARa1@400|thunder@500" "x1||thunder@300" "c01||thunder@2600" "n_12||van_engine@100;vandoor@3500" "n_13||thunder@2000" "c03|d03@300|" "x2||thunder@1500"
+ "t_title||thunder@900" "prem||thunder@1800" "a1||thunder@500" "x1||thunder@300" "c01||thunder@2600" "n_12||van_engine@100;vandoor@3500" "n_13||thunder@2000" "c03|d03@300|" "x2||thunder@1500"
  "c02||click@2600" "n_17||doorroll@1500" "n_21||" "c04||" "x5||" "i_s23||" "c05||knock@1500" "i_s25||" "c06||"
- "a2|NARa2@400|whoosh@0;thunder@700" "x3||" "n_31||" "i_s32||" "c07|d07@600|" "n_35||" "x4||" "c08||" "n_42||" "n_43||"
+ "a2||whoosh@0;thunder@700" "x3||" "n_31||" "i_s32||" "c07|d07@600|" "n_35||" "x4||" "c08||" "n_42||" "n_43||"
  "c09|d09@1000|" "c10|d10a@200;d10b@2200|" "n_46||knocking@1800" "n_51|d08@1500|phonering@0" "n_53|d11@400|"
  "c11|d12@300|" "c12||boom@1400" "n_61||thunder@800" "c13|d13@300|" "n_63||" "i_s65||" "i_s66||"
  "c14|d14@400|creak@2600"
- "a3|NARa3@400|whoosh@0;thunder@700" "c15|d15@300|" "n_72||" "n_81||" "i_s82|d16@200|" "c16||" "c17||boom@1400" "n_85||"
+ "a3||whoosh@0;thunder@700" "c15|d15@300|" "n_72||" "n_81||" "i_s82|d16@200|" "c16||" "c17||boom@1400" "n_85||"
  "c18|d17@500|" "c19|d19@300|" "c20|d20@300|" "n_89||" "c21|vo5@400|shatter@1400;boom@1450"
- "a4|NARa4@400|whoosh@0;thunder@700" "n_91||" "x6||" "c22||boom@800" "c23||" "i_s103||" "n_111||" "c24||" "n_121||" "i_s122||"
+ "a4||whoosh@0;thunder@700" "n_91||" "x6||" "c22||boom@800" "c23||" "i_s103||" "n_111||" "c24||" "n_121||" "i_s122||"
  "c25|vo6@300|click@3000" "t_end||"
 )
 : > concat.txt; for e in "${ORDER[@]}"; do echo "file 'seg/${e%%|*}.mp4'" >> concat.txt; done

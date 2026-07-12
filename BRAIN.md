@@ -63,7 +63,7 @@ shared
 | — | .env.example | Retell + ORCHESTRATOR_URL | תיעוד env |
 | — | 16 tests pass | orchestrator | regression OK |
 | — | `docs/TWILIO_RETELL_SETUP.md` | docs/ | checklist Twilio Elastic SIP → Retell → env → smoke |
-| — | PLAN.md שלב 1 | מפנה למדריך | סיוע למשתמש ב-BYOC |
+| 2026-07-12 | ראשון | `docs/TELEPHONY_OPTIONS_IL.md` — חלופות למספר IL (Twilio/Telnyx/SIP/GSM) |
 
 ---
 

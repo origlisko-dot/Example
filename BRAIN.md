@@ -62,6 +62,8 @@ shared
 | — | campaignFromRow / leadFromRow | `db/campaignMapper.ts` | טעינת run מ-Supabase |
 | — | .env.example | Retell + ORCHESTRATOR_URL | תיעוד env |
 | — | 16 tests pass | orchestrator | regression OK |
+| — | `docs/TWILIO_RETELL_SETUP.md` | docs/ | checklist Twilio Elastic SIP → Retell → env → smoke |
+| — | PLAN.md שלב 1 | מפנה למדריך | סיוע למשתמש ב-BYOC |
 
 ---
 
@@ -121,13 +123,13 @@ shared
 
 ## TODO מיידי (מתוך Plan 001)
 
-- [ ] Twilio + Retell BYOC (ידני)
+- [ ] Twilio + Retell BYOC — לפי [`docs/TWILIO_RETELL_SETUP.md`](./docs/TWILIO_RETELL_SETUP.md)
 - [x] `config.ts` — retell block
 - [x] `telephonyFactory.ts` + `orchestratorApp.ts`
 - [x] `server.ts` — POST `/run/:runId`
 - [x] `run.ts` — trigger orchestrator after startRun + resume
 - [x] Pause/Stop — sync דרך DB ב-runController
-- [ ] smoke test — שיחה אמיתית אחת
+- [ ] smoke test — שיחה אמיתית אחת (אחרי BYOC)
 
 ---
 

@@ -75,25 +75,29 @@
 
 ### שלב 1 — Twilio + Retell BYOC (תשתית חיצונית)
 
+**מדריך מלא:** [`docs/TWILIO_RETELL_SETUP.md`](./docs/TWILIO_RETELL_SETUP.md) (2026-07-12)
+
 **בעלים (ידני — עדיין נדרש):**
 
-- [ ] Twilio: רכישת/שיוך מספר ישראלי (`+972…`)
-- [ ] Retell Dashboard: BYOC SIP trunk ← Twilio
-- [ ] Retell: רישום `from_number` כמספר יוצא מאושר
-- [ ] Retell Agent: prompt template `{{system_prompt}}`, disclosure `{{disclosure_line}}` (אופציונלי)
-- [ ] Retell: Post-Call Analysis fields לפי מפתחות `outcomeSchema` (לפחות `interested`, `wants_callback`, `disposition`)
+- [ ] **A.** Twilio Elastic SIP Trunk — Termination URI + IP ACL `18.98.16.120/30` (או Credential List)
+- [ ] **A4.** שיוך מספר ל-Trunk (E.164)
+- [ ] **B.** Geographic Permissions → Elastic SIP → **Israel ON**
+- [ ] **C.** Retell Import מספר + Outbound Agent + `{{system_prompt}}`
+- [ ] **C3.** Post-Call Analysis: `interested`, `wants_callback`, `disposition`
+- [ ] **D.** Smoke test ב-Retell Dashboard → שיחה אליך
+- [ ] **E.** `.env`: `RETELL_*` + `ORCHESTRATOR_URL` → `GET /health` עם `retell: true`
 
 **Env (`.env`):**
 
 ```env
 RETELL_API_KEY=
 RETELL_AGENT_ID=
-RETELL_FROM_NUMBER=+972...        # = from_number ב-Retell
-# קיים:
-CALLER_ID=+972...                 # caller ID לוגי (יכול להיות זהה)
+RETELL_FROM_NUMBER=+972...        # = המספר המיובא ב-Retell
+CALLER_ID=+972...                 # יכול להיות זהה
+ORCHESTRATOR_URL=http://localhost:8080
 ```
 
-**Definition of Done:** Retell Console → Test Call יוצא מהמספר וחוזר עם transcript.
+**Definition of Done:** Retell Test Call + `curl /health` → `retell:true` + שיחה אחת דרך הפאנל (בלי סמלץ).
 
 ---
 
@@ -283,3 +287,4 @@ POST /run/:runId
 | תאריך | יום | שינוי |
 |--------|-----|--------|
 | 2026-07-12 | ראשון | Plan 001: מימוש קוד (Retell wiring, POST /run, web trigger, DB pause) |
+| 2026-07-12 | ראשון | שלב 1: `docs/TWILIO_RETELL_SETUP.md` — checklist Twilio BYOC |

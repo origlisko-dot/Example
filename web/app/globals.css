@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+/*
+  Theme: chosen, not defaulted. Scene — a business owner glancing at this panel
+  in a daytime office, picking a topic and watching calls tick by. So: light,
+  warm paper, calm, high legibility for Hebrew. One confident accent (indigo,
+  not the sales-blue reflex). Dispositions get a small semantic palette.
+  All OKLCH, neutrals tinted warm, never pure #000/#fff.
+*/
+:root {
+  --paper: oklch(0.992 0.004 95);   /* warm near-white background */
+  --surface: oklch(0.975 0.005 95); /* slightly raised surface */
+  --ink: oklch(0.24 0.012 80);      /* warm near-black text */
+  --muted: oklch(0.55 0.012 80);    /* secondary text */
+  --line: oklch(0.9 0.006 90);      /* hairline borders */
+
+  --accent: oklch(0.52 0.16 275);   /* indigo — primary action / selection */
+  --accent-ink: oklch(0.985 0.004 95);
+
+  /* disposition semantics */
+  --ok: oklch(0.6 0.13 150);        /* qualified / interested — green */
+  --warn: oklch(0.72 0.13 75);      /* callback later — amber */
+  --neutral: oklch(0.62 0.01 80);   /* not relevant — grey */
+  --danger: oklch(0.55 0.17 25);    /* opted out — red */
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-ok: var(--ok);
+  --color-warn: var(--warn);
+  --color-neutral: var(--neutral);
+  --color-danger: var(--danger);
+  --font-sans: var(--font-heebo);
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}

@@ -2,8 +2,9 @@ import { DEFAULT_COMPLIANCE, type Campaign, type Lead } from "@pelozen/shared";
 import { loadConfig, type OrchestratorConfig } from "./config.js";
 import { SupabaseRepo } from "./db/supabaseRepo.js";
 import { SequentialRunController, type RunControls } from "./orchestrator/runController.js";
-import { createTelephonyProvider, isRetellConfigured } from "./telephonyFactory.js";
+import { createTelephonyProvider } from "./telephonyFactory.js";
 import type { TelephonyProvider } from "./providers/telephonyProvider.js";
+import { getTelephonyStatus, type TelephonyStatus } from "./telephonyStatus.js";
 
 export interface OrchestratorBundle {
   cfg: OrchestratorConfig;
@@ -11,6 +12,8 @@ export interface OrchestratorBundle {
   controller: SequentialRunController;
   controlsState: { paused: boolean; stopped: boolean };
   telephony: TelephonyProvider;
+  telephonyStatus: TelephonyStatus;
+  /** @deprecated use telephonyStatus.retellConfigured */
   retellReady: boolean;
   runCampaign: (runId: string, campaign: Campaign, leads: Lead[]) => ReturnType<SequentialRunController["run"]>;
 }
@@ -20,6 +23,7 @@ export function buildOrchestrator(): OrchestratorBundle {
   const cfg = loadConfig();
   const repo = new SupabaseRepo(cfg.supabaseUrl, cfg.supabaseServiceRoleKey);
   const telephony = createTelephonyProvider(cfg);
+  const telephonyStatus = getTelephonyStatus(cfg);
 
   const controlsState = { paused: false, stopped: false };
   const controls: RunControls = {
@@ -34,8 +38,8 @@ export function buildOrchestrator(): OrchestratorBundle {
   });
 
   return {
-    cfg, repo, controller, controlsState, telephony,
-    retellReady: isRetellConfigured(cfg),
+    cfg, repo, controller, controlsState, telephony, telephonyStatus,
+    retellReady: telephonyStatus.retellConfigured && telephonyStatus.mode === "retell",
     runCampaign: (runId, campaign, leads) => controller.run(runId, campaign, leads),
   };
 }

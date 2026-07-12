@@ -12,7 +12,8 @@
     "build": "npm run build --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "dev:orchestrator": "npm run dev --workspace orchestrator",
-    "dev:web": "npm run dev --workspace web"
+    "dev:web": "npm run dev --workspace web",
+    "dev:pipeline": "python pipeline/dial_server.py"
   },
   "engines": {
     "node": ">=20"

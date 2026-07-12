@@ -12,7 +12,7 @@
 | # | כותרת | תאריך | יום | סטטוס |
 |---|--------|--------|-----|--------|
 | 001 | חיווט שיחה חיה — Retell + Twilio + Orchestrator | 2026-07-12 | ראשון | 🟢 קוד מוכן — ממתין Twilio BYOC |
-| 001b | GSM Gateway + סים ישראלי → Pipecat | — | — | ⬜ אם חייבים את הסים הקיים |
+| 001b | GSM Gateway + סים ישראלי → Pipecat (מקביל ל-001) | 2026-07-12 | ראשון | 🟢 קוד מוכן — ממתין קופסת GSM + Asterisk |
 | 003 | Realtime במonitor (Supabase) | — | — | ⬜ עתידי |
 | 004 | Retry policy + חיוג חוזר | — | — | ⬜ עתידי |
 | 005 | DNC import + בדיקה לפני dial | — | — | ⬜ עתידי |
@@ -238,6 +238,53 @@ POST /run/:runId
 
 ---
 
+## Plan 001b — GSM + סים ישראלי → Pipecat (מקביל ל-Retell)
+
+**תאריך:** 2026-07-12 (ראשון)  
+**סטטוס:** 🟢 קוד מוכן — שלב חומרה (GSM gateway + Asterisk) ידני  
+**מטרה:** לחייג עם **אותו מספר הסים** — בלי Port, בלי מספר חדש — במקביל למסלול Retell/Twilio.
+
+### ארכיטקטורה
+
+```
+TELEPHONY_MODE=gsm
+orchestrator → GsmPipelineProvider → pipeline/dial_server.py
+  ├─ PIPELINE_MODE=sim      (dev — ללא חומרה)
+  └─ PIPELINE_MODE=asterisk (ARI originate → GSM gateway → SIM)
+```
+
+**מדריך:** [`docs/GSM_SETUP.md`](./docs/GSM_SETUP.md)
+
+### קוד (הושלם)
+
+- [x] `TELEPHONY_MODE=auto|retell|gsm` — `config.ts`, `telephonyStatus.ts`
+- [x] `GsmPipelineProvider` — HTTP ל-pipeline
+- [x] `pipeline/dial_server.py` — `POST /dial`, `GET /calls/{id}`, modes sim/asterisk
+- [x] `GET /health` + `POST /run` — בודקים `telephonyReady` לפי mode (לא Retell בלבד)
+- [x] `npm run dev:pipeline` — root `package.json`
+- [x] tests — `telephonyStatus.test.ts`
+
+### ידני (עדיין נדרש)
+
+- [ ] קניית GSM gateway + הכנסת SIM
+- [ ] Asterisk + PJSIP endpoint (`GSM_GATEWAY_ENDPOINT`)
+- [ ] `PIPELINE_MODE=asterisk` + `ASTERISK_ARI_*`
+- [ ] Pipecat audio bridge (Stasis → `agent.py`) — שיחה קולית אמיתית
+
+### Env (GSM)
+
+```env
+TELEPHONY_MODE=gsm
+PIPELINE_URL=http://127.0.0.1:8090
+PIPELINE_MODE=sim          # dev; asterisk ב-production
+CALLER_ID=+972...          # מספר הסים
+```
+
+**Definition of Done (dev):** `curl /health` → `mode=gsm, telephonyReady=true` + run מהפאנל דרך pipeline sim.  
+**Definition of Done (prod):** שיחה אמיתית דרך הסים → outcome ב-DB.
+
+---
+
 ## Plan 002 — Auth + RLS (עתידי)
 
 **תאריך:** —  
@@ -287,4 +334,6 @@ POST /run/:runId
 | תאריך | יום | שינוי |
 |--------|-----|--------|
 | 2026-07-12 | ראשון | Plan 001: מימוש קוד (Retell wiring, POST /run, web trigger, DB pause) |
+| 2026-07-12 | ראשון | Plan 001b: טלפוניה מקבילה — `TELEPHONY_MODE`, GSM pipeline, `dial_server.py` |
 | 2026-07-12 | ראשון | שלב 1: `docs/TWILIO_RETELL_SETUP.md` — checklist Twilio BYOC |
+| 2026-07-12 | ראשון | `docs/GSM_SETUP.md` — מסלול SIM/GSM |

@@ -30,10 +30,16 @@ export function startServer(orchestrator: OrchestratorBundle) {
     if (req.method === "OPTIONS") { res.writeHead(204); res.end(); return; }
 
     if (req.method === "GET" && req.url === "/health") {
+      const ts = orchestrator.telephonyStatus;
       json(res, 200, {
         ok: true,
-        retell: orchestrator.retellReady,
+        telephonyMode: ts.mode,
+        telephonyReady: ts.ready,
         telephony: orchestrator.telephony.kind,
+        retellConfigured: ts.retellConfigured,
+        gsmConfigured: ts.gsmConfigured,
+        pipelineUrl: ts.pipelineUrl,
+        hint: ts.hint,
       });
       return;
     }
@@ -61,9 +67,11 @@ export function startServer(orchestrator: OrchestratorBundle) {
     if (runMatch) {
       const runId = runMatch[1]!;
 
-      if (!orchestrator.retellReady) {
+      const ts = orchestrator.telephonyStatus;
+      if (!ts.ready) {
         json(res, 503, {
-          error: "Retell not configured — set RETELL_API_KEY, RETELL_AGENT_ID, RETELL_FROM_NUMBER",
+          error: ts.hint ?? "Telephony not configured",
+          mode: ts.mode,
         });
         return;
       }
@@ -92,7 +100,10 @@ export function startServer(orchestrator: OrchestratorBundle) {
   });
 
   server.listen(cfg.port, () => {
-    console.log(`orchestrator http listening on :${cfg.port} (retell=${orchestrator.retellReady})`);
+    const ts = orchestrator.telephonyStatus;
+    console.log(
+      `orchestrator http listening on :${cfg.port} (mode=${ts.mode}, ready=${ts.ready})`,
+    );
   });
   return server;
 }

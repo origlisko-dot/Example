@@ -12,10 +12,10 @@
 | Monorepo | `shared`, `orchestrator`, `web`, `pipeline`, `supabase` |
 | UI | ✅ עובד — טעינה, scraper, monitor, results, editor (ראה צילומי מסך 2026-07-12) |
 | DB | ✅ `0001_init.sql` — 12 טבלאות |
-| ליבה נבדקת | 22 unit tests (phone, parse, outcomeEval, runController) |
-| טלפוניה | ✅ `RetellProvider` מחובר ב-`orchestratorApp`; stub אם env חסר |
-| שיחה חיה | ⏳ קוד מוכן — חסר: Twilio BYOC + env `RETELL_*` |
-| תוכנית | [`PLAN.md`](./PLAN.md) Plan 001 — 🟢 קוד / ⏳ Twilio |
+| ליבה נבדקת | 20 unit tests (phone, parse, outcomeEval, runController, telephonyStatus) |
+| טלפוניה | ✅ **שני מסלולים במקביל:** Retell (Port/Twilio) **או** GSM/Pipecat (SIM) — `TELEPHONY_MODE` |
+| שיחה חיה | ⏳ Retell: Twilio BYOC + `RETELL_*` · GSM: קופסה+SIM או `PIPELINE_MODE=sim` ל-dev |
+| תוכנית | [`PLAN.md`](./PLAN.md) Plan 001 + 001b — 🟢 קוד / ⏳ תשתית חיצונית |
 
 ---
 
@@ -29,8 +29,13 @@ web (Next.js RTL)
 orchestrator
   ├─ SequentialRunController (gates → dial → classify → persist)
   ├─ POST /run/:runId → runWorker → SequentialRunController
-  ├─ RetellProvider (default) | AsteriskGsmProvider (fallback)
+  ├─ TELEPHONY_MODE=auto|retell|gsm
+  │   ├─ retell → RetellProvider → Retell API → Twilio BYOC
+  │   └─ gsm    → GsmPipelineProvider → pipeline/dial_server.py (sim | asterisk)
   └─ PelozenScraperSource (Playwright)
+
+pipeline
+  └─ dial_server.py — FastAPI dial + poll (sim dev / ARI originate prod)
 
 shared
   ├─ phone.ts, leadParse.ts, compliance/config.ts, types
@@ -65,6 +70,18 @@ shared
 | — | `docs/TWILIO_RETELL_SETUP.md` | docs/ | checklist Twilio Elastic SIP → Retell → env → smoke |
 | 2026-07-12 | ראשון | `docs/TELEPHONY_OPTIONS_IL.md` — חלופות למספר IL (Twilio/Telnyx/SIP/GSM) |
 
+### 2026-07-12 (ראשון) — Plan 001b טלפוניה מקבילה (Retell + GSM)
+
+| זמן | מה | איפה | למה |
+|-----|-----|------|-----|
+| — | `TELEPHONY_MODE` auto/retell/gsm | `config.ts`, `telephonyStatus.ts` | בחירת מסלול לפי env |
+| — | GsmPipelineProvider | `providers/gsmPipelineProvider.ts` | orchestrator → Python pipeline |
+| — | dial service | `pipeline/dial_server.py` | sim (dev) + asterisk ARI skeleton |
+| — | health/run gates | `server.ts`, `orchestratorApp.ts` | ready לפי mode, לא Retell-only |
+| — | docs GSM | `docs/GSM_SETUP.md` | הוראות SIM/GSM בעברית |
+| — | dev:pipeline | root `package.json` | הרצת pipeline בקלות |
+| — | 20 tests pass | orchestrator | + telephonyStatus |
+
 ---
 
 ## קבצים קריטיים (מפתח)
@@ -74,10 +91,13 @@ shared
 | `shared/src/compliance/config.ts` | ציות — חלון חיוג, opt-out, disclosure |
 | `orchestrator/src/orchestrator/runController.ts` | לולאת חיוג + gates |
 | `orchestrator/src/providers/retellProvider.ts` | Retell create-call + poll |
-| `orchestrator/src/orchestratorApp.ts` | buildOrchestrator — Retell default |
+| `orchestrator/src/orchestratorApp.ts` | buildOrchestrator — mode-aware telephony |
 | `orchestrator/src/runWorker.ts` | POST /run loader |
 | `orchestrator/src/server.ts` | HTTP — /scrape, /run/:id, /health |
-| `orchestrator/src/index.ts` | entry — startServer |
+| `orchestrator/src/telephonyStatus.ts` | resolve mode + health hints |
+| `orchestrator/src/providers/gsmPipelineProvider.ts` | GSM/Pipecat HTTP client |
+| `pipeline/dial_server.py` | dial + poll (sim / asterisk) |
+| `docs/GSM_SETUP.md` | מדריך מסלול SIM |
 | `web/app/actions/run.ts` | startRun, simulateNextCall |
 | `web/app/actions/loadBatch.ts` | parse + consent + leads |
 | `supabase/migrations/0001_init.sql` | schema |
@@ -93,7 +113,9 @@ shared
 | `PHONE_HASH_SECRET` | HMAC לידים | נדרש |
 | `PELOZEN_USERNAME/PASSWORD` | scraper | נדרש ל-scrape |
 | `NEXT_PUBLIC_ORCHESTRATOR_URL` | web → /scrape | נדרש |
-| `RETELL_API_KEY` | RetellProvider | ⏳ env נדרש |
+| `TELEPHONY_MODE` | auto / retell / gsm | `auto` |
+| `PIPELINE_URL` | GSM path dial service | default localhost:8090 |
+| `RETELL_API_KEY` | RetellProvider | ⏳ env נדרש (מסלול 1) |
 | `RETELL_AGENT_ID` | RetellProvider | ⏳ env נדרש |
 | `RETELL_FROM_NUMBER` | BYOC from_number | ⏳ env נדרש |
 | `ORCHESTRATOR_URL` | web → POST /run | ⏳ env נדרש |
@@ -106,7 +128,7 @@ shared
 1. `/` — בחר תחום  
 2. `/run/[id]` — הדבק / scrape 20  
 3. "התחל חיוג" → `/monitor/[runId]`  
-4. (עכשיו) "סמלץ שיחה" · (אחרי Plan 001) שיחות אמיתיות  
+4. (עכשיו) GSM sim או "סמלץ שיחה" · Retell/GSM prod — שיחות אמיתיות  
 5. `/results/[id]` + ייצוא CSV  
 
 ---
@@ -121,15 +143,20 @@ shared
 
 ---
 
-## TODO מיידי (מתוך Plan 001)
+## TODO מיידי
 
-- [ ] Twilio + Retell BYOC — לפי [`docs/TWILIO_RETELL_SETUP.md`](./docs/TWILIO_RETELL_SETUP.md)
-- [x] `config.ts` — retell block
+**מסלול 1 — Retell/Twilio:** [`docs/TWILIO_RETELL_SETUP.md`](./docs/TWILIO_RETELL_SETUP.md)  
+**מסלול 2 — GSM/SIM:** [`docs/GSM_SETUP.md`](./docs/GSM_SETUP.md)
+
+- [ ] Twilio + Retell BYOC (ידני)
+- [ ] GSM gateway + Asterisk (ידני)
+- [ ] Pipecat audio bridge (Stasis → agent.py)
+- [x] `TELEPHONY_MODE` + GSM pipeline code
 - [x] `telephonyFactory.ts` + `orchestratorApp.ts`
-- [x] `server.ts` — POST `/run/:runId`
+- [x] `server.ts` — POST `/run/:runId` + mode-aware health
 - [x] `run.ts` — trigger orchestrator after startRun + resume
 - [x] Pause/Stop — sync דרך DB ב-runController
-- [ ] smoke test — שיחה אמיתית אחת (אחרי BYOC)
+- [ ] smoke test — Retell **או** GSM sim end-to-end מהפאנל
 
 ---
 

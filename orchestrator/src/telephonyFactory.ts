@@ -1,11 +1,20 @@
 import type { OrchestratorConfig } from "./config.js";
-import { AsteriskGsmProvider, type TelephonyProvider } from "./providers/telephonyProvider.js";
+import { GsmPipelineProvider } from "./providers/gsmPipelineProvider.js";
 import { RetellProvider } from "./providers/retellProvider.js";
+import type { TelephonyProvider } from "./providers/telephonyProvider.js";
+import { isRetellConfigured, resolveTelephonyMode } from "./telephonyStatus.js";
 
-/** Pick Retell when configured; otherwise fall back to the Asterisk GSM stub. */
+/** Pick provider from TELEPHONY_MODE (auto | retell | gsm). */
 export function createTelephonyProvider(cfg: OrchestratorConfig): TelephonyProvider {
-  const r = cfg.retell;
-  if (r?.apiKey && r.agentId && r.fromNumber) {
+  const mode = resolveTelephonyMode(cfg);
+
+  if (mode === "retell") {
+    if (!isRetellConfigured(cfg)) {
+      throw new Error(
+        "TELEPHONY_MODE=retell but RETELL_API_KEY / RETELL_AGENT_ID / RETELL_FROM_NUMBER missing",
+      );
+    }
+    const r = cfg.retell!;
     return new RetellProvider({
       apiKey: r.apiKey,
       fromNumber: r.fromNumber,
@@ -15,16 +24,5 @@ export function createTelephonyProvider(cfg: OrchestratorConfig): TelephonyProvi
     });
   }
 
-  if (!r?.apiKey) {
-    console.warn("orchestrator: RETELL_API_KEY not set — telephony dial will fail until Retell is configured");
-  }
-  return new AsteriskGsmProvider({
-    ariUrl: cfg.sip.gatewayHost,
-    gatewayEndpoint: cfg.sip.username,
-  });
-}
-
-export function isRetellConfigured(cfg: OrchestratorConfig): boolean {
-  const r = cfg.retell;
-  return Boolean(r?.apiKey && r.agentId && r.fromNumber);
+  return new GsmPipelineProvider(cfg.pipeline);
 }

@@ -13,11 +13,15 @@ class FakeRepo {
   suppressions: string[] = [];
   outcomes: { leadId: string; disposition: string; qualified: boolean }[] = [];
   runState: { state: string; reason?: string }[] = [];
+  dbRunState: import("../db/repo.js").RunState = "running";
   private n = 0;
 
+  async getRunState() { return this.dbRunState; }
   async isSuppressed(p: string) { return this.suppressed.has(p); }
   async hasConsent(leadId: string) { return !this.noConsent.has(leadId); }
-  async createCallAttempt() { return { id: `att-${++this.n}` }; }
+  async acquireCallAttempt() { return { id: `att-${++this.n}` }; }
+  async skipQueuedAttemptForLead() {}
+  async skipQueuedAttempt() {}
   async finishCallAttempt() {}
   async recordOutcome(i: { leadId: string; disposition: string; qualified: boolean }) { this.outcomes.push(i); }
   async saveTranscript() {}

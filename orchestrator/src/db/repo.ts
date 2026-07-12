@@ -5,17 +5,26 @@ import type { Disposition, LeadStatus, SuppressionReason } from "@pelozen/shared
  * the controller can be unit-tested with an in-memory fake and the live
  * Supabase implementation stays swappable.
  */
+export type RunState = "running" | "paused" | "stopped" | "done";
+
 export interface Repo {
+  getRunState(runId: string): Promise<RunState>;
   isSuppressed(phoneE164: string): Promise<boolean>;
   hasConsent(leadId: string): Promise<boolean>;
 
-  createCallAttempt(input: {
+  /** Reuse a queued attempt from the panel, or insert a fresh one. */
+  acquireCallAttempt(input: {
     runId: string;
     leadId: string;
     campaignVersion: number;
     attemptNo: number;
     aiDisclosed: boolean;
   }): Promise<{ id: string }>;
+
+  skipQueuedAttempt(id: string, endReason: string): Promise<void>;
+
+  /** Mark the panel's pre-created queued attempt as skipped (suppression / no consent). */
+  skipQueuedAttemptForLead(runId: string, leadId: string, endReason: string): Promise<void>;
 
   finishCallAttempt(id: string, patch: {
     state: string;

@@ -11,7 +11,7 @@
 
 | # | כותרת | תאריך | יום | סטטוס |
 |---|--------|--------|-----|--------|
-| 001 | חיווט שיחה חיה — Retell + Twilio + Orchestrator | 2026-07-12 | ראשון | 🟡 בתכנון |
+| 001 | חיווט שיחה חיה — Retell + Twilio + Orchestrator | 2026-07-12 | ראשון | 🟢 קוד מוכן — ממתין Twilio BYOC |
 | 002 | Auth + RLS אמיתי בפאנל | — | — | ⬜ עתידי |
 | 003 | Realtime במonitor (Supabase) | — | — | ⬜ עתידי |
 | 004 | Retry policy + חיוג חוזר | — | — | ⬜ עתידי |
@@ -27,7 +27,7 @@
 ## Plan 001 — חיווט שיחה חיה (Retell + Twilio + Orchestrator)
 
 **תאריך:** 2026-07-12 (ראשון)  
-**סטטוס:** 🟡 בתכנון  
+**סטטוס:** 🟢 קוד מוכן — שלב 1 (Twilio BYOC) ידני  
 **מטרה:** לעבור מסימולציה (`simulateNextCall`) לשיחות אמיתיות — קו אחד, רצף, תוצאה מובנית ב-DB.
 
 ### רקע — מה כבר עובד
@@ -53,9 +53,29 @@
 
 ---
 
+### שלב 2 — Orchestrator: RetellProvider כ-provider ברירת מחדל
+
+- [x] `orchestrator/src/config.ts` — block retell
+- [x] `orchestrator/src/telephonyFactory.ts` — בחירת Retell/Asterisk
+- [x] `orchestrator/src/orchestratorApp.ts` — `buildOrchestrator()`
+
+### שלב 3 — Endpoint `POST /run/:runId`
+
+- [x] `orchestrator/src/runWorker.ts` — טעינה מ-DB + `controller.run()`
+- [x] `orchestrator/src/server.ts` — `POST /run/:runId` async, idempotency 409
+
+### שלב 4 — Web: חיבור Start → Orchestrator
+
+- [x] `web/app/actions/run.ts` — `triggerOrchestratorRun` אחרי startRun + resume
+
+### שלב 5 — Pause / Stop סינכרוני
+
+- [x] `Repo.getRunState` + `runController.checkHalt()` — קורא DB כל lead
+- [x] `acquireCallAttempt` — ממחזר queued attempts מה-web
+
 ### שלב 1 — Twilio + Retell BYOC (תשתית חיצונית)
 
-**בעלים (ידני):**
+**בעלים (ידני — עדיין נדרש):**
 
 - [ ] Twilio: רכישת/שיוך מספר ישראלי (`+972…`)
 - [ ] Retell Dashboard: BYOC SIP trunk ← Twilio
@@ -262,4 +282,4 @@ POST /run/:runId
 
 | תאריך | יום | שינוי |
 |--------|-----|--------|
-| 2026-07-12 | ראשון | יצירת PLAN.md — Plan 001–005 |
+| 2026-07-12 | ראשון | Plan 001: מימוש קוד (Retell wiring, POST /run, web trigger, DB pause) |

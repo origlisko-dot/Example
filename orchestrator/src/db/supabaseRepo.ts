@@ -1,6 +1,6 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { Disposition, LeadStatus, SuppressionReason } from "@pelozen/shared";
-import type { Repo } from "./repo.js";
+import type { Repo, RunState } from "./repo.js";
 
 /**
  * Live Repo backed by Supabase. Uses the SERVICE-ROLE key (bypasses RLS) and
@@ -11,6 +11,11 @@ export class SupabaseRepo implements Repo {
 
   constructor(url: string, serviceRoleKey: string) {
     this.db = createClient(url, serviceRoleKey, { auth: { persistSession: false } });
+  }
+
+  async getRunState(runId: string): Promise<RunState> {
+    const { data } = await this.db.from("runs").select("state").eq("id", runId).maybeSingle();
+    return (data?.state as RunState) ?? "stopped";
   }
 
   async isSuppressed(phoneE164: string): Promise<boolean> {
@@ -25,15 +30,53 @@ export class SupabaseRepo implements Repo {
     return Boolean(data?.consent_record_id);
   }
 
-  async createCallAttempt(input: {
+  async acquireCallAttempt(input: {
     runId: string; leadId: string; campaignVersion: number; attemptNo: number; aiDisclosed: boolean;
   }): Promise<{ id: string }> {
+    const { data: existing } = await this.db
+      .from("call_attempts")
+      .select("id")
+      .eq("run_id", input.runId)
+      .eq("lead_id", input.leadId)
+      .eq("state", "queued")
+      .maybeSingle();
+
+    if (existing?.id) {
+      await this.db.from("call_attempts").update({
+        campaign_version: input.campaignVersion,
+        attempt_no: input.attemptNo,
+        ai_disclosed: input.aiDisclosed,
+        state: "dialing",
+        dialed_at: new Date().toISOString(),
+      }).eq("id", existing.id);
+      return { id: existing.id as string };
+    }
+
     const { data, error } = await this.db.from("call_attempts").insert({
       run_id: input.runId, lead_id: input.leadId, campaign_version: input.campaignVersion,
       attempt_no: input.attemptNo, ai_disclosed: input.aiDisclosed, state: "dialing", dialed_at: new Date().toISOString(),
     }).select("id").single();
     if (error) throw error;
     return { id: data.id as string };
+  }
+
+  async skipQueuedAttempt(id: string, endReason: string): Promise<void> {
+    await this.db.from("call_attempts").update({
+      state: "failed",
+      end_reason: endReason,
+      ended_at: new Date().toISOString(),
+    }).eq("id", id);
+  }
+
+  async skipQueuedAttemptForLead(runId: string, leadId: string, endReason: string): Promise<void> {
+    const { data } = await this.db
+      .from("call_attempts")
+      .select("id")
+      .eq("run_id", runId)
+      .eq("lead_id", leadId)
+      .eq("state", "queued")
+      .maybeSingle();
+    if (data?.id) await this.skipQueuedAttempt(data.id as string, endReason);
   }
 
   async finishCallAttempt(id: string, patch: {

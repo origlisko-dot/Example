@@ -13,6 +13,26 @@ export interface RunSnapshot {
   feed: { phone: string; disposition: string }[];
 }
 
+/** Fire-and-forget: ask the orchestrator VPS to dial this run. */
+async function triggerOrchestratorRun(runId: string): Promise<void> {
+  const base =
+    process.env.ORCHESTRATOR_URL ??
+    process.env.NEXT_PUBLIC_ORCHESTRATOR_URL;
+  if (!base) return;
+
+  try {
+    const res = await fetch(`${base.replace(/\/$/, "")}/run/${runId}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    });
+    if (!res.ok && res.status !== 409) {
+      console.error(`orchestrator /run/${runId} → ${res.status}: ${await res.text()}`);
+    }
+  } catch (e) {
+    console.error(`orchestrator /run/${runId} unreachable:`, e);
+  }
+}
+
 /** Create a run for the campaign's freshly-loaded leads and queue an attempt each. */
 export async function startRun(campaignId: string): Promise<{ runId: string; queued: number }> {
   const supabase = createServerClient();
@@ -40,6 +60,10 @@ export async function startRun(campaignId: string): Promise<{ runId: string; que
     await supabase.from("leads").update({ status: "queued" }).in("id", leadIds);
   }
 
+  if (leadIds.length > 0) {
+    void triggerOrchestratorRun(runId);
+  }
+
   return { runId, queued: leadIds.length };
 }
 
@@ -49,6 +73,10 @@ export async function setRunState(runId: string, state: RunState): Promise<void>
     .from("runs")
     .update({ state, ended_at: state === "done" || state === "stopped" ? new Date().toISOString() : null })
     .eq("id", runId);
+
+  if (state === "running") {
+    void triggerOrchestratorRun(runId);
+  }
 }
 
 export async function getRunSnapshot(runId: string): Promise<RunSnapshot> {
@@ -88,10 +116,8 @@ export async function getRunSnapshot(runId: string): Promise<RunSnapshot> {
 }
 
 /**
- * DEV/TEST ONLY — simulate the next queued call so the monitor + results can be
- * exercised before the telephony pipeline is wired. Drives the SAME tables the
- * orchestrator will (call_attempts → outcome → transcript → lead status →
- * suppression on opt-out), so this validates the data pipeline end-to-end.
+ * DEV/TEST ONLY — simulate the next queued call when Retell is not wired.
+ * Hidden once live telephony is active; safe to keep for local dev without env.
  */
 const SIM_CYCLE = [
   "qualified_for_human", "interested", "not_relevant",

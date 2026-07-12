@@ -5,17 +5,16 @@ import {
 import { compilePrompt } from "../campaigns/promptCompiler.js";
 import { classifyDisposition } from "../campaigns/outcomeEval.js";
 import { createPhoneHash } from "../util/hash.js";
-import type { Repo } from "../db/repo.js";
+import type { Repo, RunState } from "../db/repo.js";
 import type { TelephonyProvider, DialResult } from "../providers/telephonyProvider.js";
 
 /**
- * The sequential dial loop — the spine of the system. One SIM line = one call
- * at a time, so this is a plain `for…await` over the batch, with the compliance
- * gates evaluated immediately before every dial.
+ * The sequential dial loop — the spine of the system. One line = one call at a
+ * time, plain `for…await` over the batch, compliance gates before every dial.
  *
  * Gate order (fail safe, every iteration):
- *   stop/pause → calling-window → suppression → consent → dial → classify →
- *   opt-out sweep → persist.
+ *   stop/pause (DB + in-memory) → calling-window → suppression → consent →
+ *   dial → classify → opt-out sweep → persist.
  */
 
 export interface RunControls {
@@ -57,8 +56,13 @@ export class SequentialRunController {
     const disclosureLine = disclose ? compliance.disclosure.text : null;
 
     for (const lead of leads) {
-      if (controls.isStopped()) { summary.haltedReason = "stopped"; break; }
-      if (controls.isPaused()) { summary.haltedReason = "paused"; break; }
+      const halt = await this.checkHalt(runId, controls);
+      if (halt) {
+        summary.haltedReason = halt;
+        if (halt === "stopped") await repo.setRunState(runId, "stopped");
+        break;
+      }
+
       if (!isWithinCallingWindow(clock.now(), compliance.callingWindow)) {
         summary.haltedReason = "outside_hours";
         await repo.setRunState(runId, "paused", "outside_calling_window");
@@ -67,11 +71,13 @@ export class SequentialRunController {
 
       // ── gates ──
       if (await repo.isSuppressed(lead.phoneE164)) {
+        await repo.skipQueuedAttemptForLead(runId, lead.id, "suppressed");
         await repo.setLeadStatus(lead.id, "suppressed", "opt_out");
         summary.suppressed++;
         continue;
       }
       if (compliance.requireConsentRecord && !(await repo.hasConsent(lead.id))) {
+        await repo.skipQueuedAttemptForLead(runId, lead.id, "no_consent");
         await repo.setLeadStatus(lead.id, "new");
         await repo.audit("skip_no_consent", "lead", lead.id);
         summary.skippedNoConsent++;
@@ -79,7 +85,7 @@ export class SequentialRunController {
       }
 
       // ── dial ──
-      const attempt = await repo.createCallAttempt({
+      const attempt = await repo.acquireCallAttempt({
         runId, leadId: lead.id, campaignVersion: campaign.version,
         attemptNo: 1, aiDisclosed: disclose,
       });
@@ -101,7 +107,7 @@ export class SequentialRunController {
         });
       } catch {
         await repo.finishCallAttempt(attempt.id, { state: "failed", endReason: "failed", durationSec: 0 });
-        await repo.setLeadStatus(lead.id, "new");
+        await repo.setLeadStatus(lead.id, "queued");
         continue;
       }
       summary.dialed++;
@@ -114,7 +120,6 @@ export class SequentialRunController {
       });
 
       if (result.endReason !== "answered") {
-        // no_answer / busy / failed / voicemail → leave for a later retry pass
         await repo.setLeadStatus(lead.id, "queued");
         continue;
       }
@@ -147,7 +152,6 @@ export class SequentialRunController {
         structured,
         qualified: disposition === "qualified_for_human",
       });
-      // Recording is OFF by default — we persist only the short text transcript.
       await repo.saveTranscript(attempt.id, result.transcript ?? []);
     }
 
@@ -156,6 +160,17 @@ export class SequentialRunController {
       await repo.setRunState(runId, "done");
     }
     return summary;
+  }
+
+  /** In-memory controls (tests) take precedence; then DB run state from the panel. */
+  private async checkHalt(runId: string, controls: RunControls): Promise<RunSummary["haltedReason"] | null> {
+    if (controls.isStopped()) return "stopped";
+    if (controls.isPaused()) return "paused";
+
+    const state: RunState = await this.deps.repo.getRunState(runId);
+    if (state === "stopped") return "stopped";
+    if (state === "paused") return "paused";
+    return null;
   }
 }
 

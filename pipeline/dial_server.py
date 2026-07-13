@@ -32,12 +32,34 @@ load_dotenv()
 app = FastAPI(title="Pelozen Pipeline Dial Service")
 
 SIM_CYCLE = [
-    {"disposition": "qualified_for_human", "interested": True, "wants_callback": True},
-    {"disposition": "interested", "interested": True, "wants_callback": False},
-    {"disposition": "not_relevant", "interested": False, "wants_callback": False},
-    {"disposition": "callback_later", "interested": True, "wants_callback": True},
-    {"disposition": "no_answer", "interested": False},
-    {"disposition": "opted_out", "disposition": "opted_out", "opt_out": True},
+    # Matches SAMPLE_CAMPAIGN successExpr (interested && business_active && wants_callback)
+    {
+        "disposition": "qualified_for_human",
+        "interested": True,
+        "business_active": True,
+        "wants_callback": True,
+    },
+    {
+        "disposition": "interested",
+        "interested": True,
+        "business_active": True,
+        "wants_callback": False,
+    },
+    {
+        "disposition": "not_relevant",
+        "interested": False,
+        "business_active": False,
+        "wants_callback": False,
+    },
+    {
+        "disposition": "callback_later",
+        "interested": True,
+        "business_active": True,
+        "wants_callback": True,
+        "best_callback_time": "בערב",
+    },
+    {"disposition": "no_answer"},
+    {"disposition": "opted_out", "interested": False, "opt_out": True},
 ]
 
 _sim_counter = 0

@@ -12,7 +12,7 @@
 | # | כותרת | תאריך | יום | סטטוס |
 |---|--------|--------|-----|--------|
 | 001 | חיווט שיחה חיה — Retell + Twilio + Orchestrator | 2026-07-12 | ראשון | 🟢 קוד מוכן — ממתין Twilio BYOC |
-| 001b | GSM Gateway + סים ישראלי → Pipecat (מקביל ל-001) | 2026-07-12 | ראשון | 🟢 קוד מוכן — ממתין קופסת GSM + Asterisk |
+| 001b | GSM Gateway + סים ישראלי → Pipecat (מקביל ל-001) | 2026-07-12 | ראשון | 🟢 קוד + smoke e2e — ממתין קופסת GSM |
 | 003 | Realtime במonitor (Supabase) | — | — | ⬜ עתידי |
 | 004 | Retry policy + חיוג חוזר | — | — | ⬜ עתידי |
 | 005 | DNC import + בדיקה לפני dial | — | — | ⬜ עתידי |
@@ -263,6 +263,7 @@ orchestrator → GsmPipelineProvider → pipeline/dial_server.py
 - [x] `GET /health` + `POST /run` — בודקים `telephonyReady` לפי mode (לא Retell בלבד)
 - [x] `npm run dev:pipeline` — root `package.json`
 - [x] tests — `telephonyStatus.test.ts`
+- [x] `npm run smoke:gsm` + `POST /smoke/gsm` — e2e בלי Supabase (MemoryRepo)
 
 ### ידני (עדיין נדרש)
 

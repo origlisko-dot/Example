@@ -82,6 +82,7 @@ shared
 | — | dev:pipeline | root `package.json` | הרצת pipeline בקלות |
 | — | 20 tests pass | orchestrator | + telephonyStatus |
 | 2026-07-13 | שני | `python3` + `setup:pipeline` | Linux: אין `python`; pip --user בלי sudo |
+| 2026-07-13 | שני | `smoke:gsm` + POST /smoke/gsm | e2e MemoryRepo→GsmPipeline→dial_server sim | dialed=2 qualified=1 |
 
 ---
 
@@ -153,6 +154,7 @@ shared
 - [ ] GSM gateway + Asterisk (ידני)
 - [ ] Pipecat audio bridge (Stasis → agent.py)
 - [x] `TELEPHONY_MODE` + GSM pipeline code
+- [x] smoke:gsm e2e (MemoryRepo, closed env)
 - [x] `telephonyFactory.ts` + `orchestratorApp.ts`
 - [x] `server.ts` — POST `/run/:runId` + mode-aware health
 - [x] `run.ts` — trigger orchestrator after startRun + resume

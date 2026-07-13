@@ -4,12 +4,14 @@ import { PelozenScraperSource } from "./leadSource/pelozenScraperSource.js";
 import { ingestLeads } from "./leadIngest.js";
 import { executeRun, RunNotFoundError, RunNotRunnableError } from "./runWorker.js";
 import type { OrchestratorBundle } from "./orchestratorApp.js";
+import { runGsmSmoke } from "./smoke/runGsmSmoke.js";
 
 /**
  * HTTP surface for the panel:
  *   GET  /health
  *   POST /scrape
  *   POST /run/:runId   — start/resume the sequential dial loop (async)
+ *   POST /smoke/gsm    — closed-env GSM e2e (MemoryRepo, no Supabase); SMOKE_ENDPOINTS=1
  */
 export function startServer(orchestrator: OrchestratorBundle) {
   const { cfg, controller } = orchestrator;
@@ -57,6 +59,31 @@ export function startServer(orchestrator: OrchestratorBundle) {
         const { leads, rejected } = await scraper.loadBatch(interestId, count);
         const ingest = await ingestLeads(db, campaignId, leads, cfg.phoneHashSecret);
         json(res, 200, { ...ingest, invalid: rejected.length });
+      } catch (e) {
+        json(res, 500, { error: (e as Error).message });
+      }
+      return;
+    }
+
+    if (req.method === "POST" && req.url === "/smoke/gsm") {
+      if (process.env.SMOKE_ENDPOINTS !== "1") {
+        json(res, 403, { error: "Set SMOKE_ENDPOINTS=1 to enable closed-env smoke" });
+        return;
+      }
+      const ts = orchestrator.telephonyStatus;
+      if (ts.mode !== "gsm" || !ts.ready) {
+        json(res, 503, { error: "GSM telephony not ready", status: ts });
+        return;
+      }
+      try {
+        const body = await readJson(req);
+        const leadCount = Math.min(Number(body.leadCount) || 2, 5);
+        const result = await runGsmSmoke(orchestrator.telephony, {
+          callerId: cfg.callerId,
+          phoneHashSecret: cfg.phoneHashSecret,
+          leadCount,
+        });
+        json(res, 200, result);
       } catch (e) {
         json(res, 500, { error: (e as Error).message });
       }

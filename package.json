@@ -14,7 +14,8 @@
     "dev:orchestrator": "npm run dev --workspace orchestrator",
     "dev:web": "npm run dev --workspace web",
     "setup:pipeline": "python3 -m pip install --user -r pipeline/requirements.txt",
-    "dev:pipeline": "python3 pipeline/dial_server.py"
+    "dev:pipeline": "python3 pipeline/dial_server.py",
+    "smoke:gsm": "npm run smoke:gsm --workspace orchestrator"
   },
   "engines": {
     "node": ">=20"

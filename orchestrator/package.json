@@ -8,7 +8,8 @@
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "dev": "node --env-file-if-exists=../.env --import tsx --watch src/index.ts",
-    "test": "node --test --import tsx './src/**/*.test.ts' './src/*.test.ts'"
+    "test": "node --test --import tsx './src/**/*.test.ts' './src/*.test.ts'",
+    "smoke:gsm": "node --env-file-if-exists=../.env --import tsx src/smoke/smokeGsmCli.ts"
   },
   "dependencies": {
     "@pelozen/shared": "*",

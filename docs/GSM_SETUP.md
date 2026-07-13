@@ -48,7 +48,18 @@ npm run dev:web
 
 `curl http://localhost:8080/health` → `"mode":"gsm","telephonyReady":true`
 
-"התחל חיוג" — שיחות מדומות (כמו סמלץ, אבל דרך pipeline אמיתי).
+**Smoke מקצה לקצה (בלי Supabase):**
+
+```bash
+# pipeline + orchestrator רצים, ואז:
+npm run smoke:gsm
+# או:
+curl -X POST http://localhost:8080/smoke/gsm -H 'content-type: application/json' -d '{"leadCount":2}'
+```
+
+דורש `SMOKE_ENDPOINTS=1` ב-`.env`. מריץ `SequentialRunController` עם MemoryRepo + pipeline sim.
+
+"התחל חיוג" מהפאנל — שיחות מדומות (כמו סמלץ, אבל דרך pipeline אמיתי). לפאנל מלא צריך Supabase אמיתי.
 
 ---
 

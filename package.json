@@ -13,7 +13,8 @@
     "typecheck": "npm run typecheck --workspaces --if-present",
     "dev:orchestrator": "npm run dev --workspace orchestrator",
     "dev:web": "npm run dev --workspace web",
-    "dev:pipeline": "python pipeline/dial_server.py"
+    "setup:pipeline": "python3 -m pip install --user -r pipeline/requirements.txt",
+    "dev:pipeline": "python3 pipeline/dial_server.py"
   },
   "engines": {
     "node": ">=20"

@@ -81,6 +81,7 @@ shared
 | — | docs GSM | `docs/GSM_SETUP.md` | הוראות SIM/GSM בעברית |
 | — | dev:pipeline | root `package.json` | הרצת pipeline בקלות |
 | — | 20 tests pass | orchestrator | + telephonyStatus |
+| 2026-07-13 | שני | `python3` + `setup:pipeline` | Linux: אין `python`; pip --user בלי sudo |
 
 ---
 

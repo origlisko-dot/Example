@@ -9,6 +9,27 @@
 
 ---
 
+## התקנת Python (חובה לפני pipeline)
+
+**אין צורך ב-Homebrew, Python 3.14, או sudo.**
+
+ב-Linux / Cloud Agent יש כבר `python3` (3.12). הפקודה `python` לבד **לא** קיימת — זה תקין.
+
+```bash
+# פעם אחת — התקנת חבילות (בלי sudo)
+npm run setup:pipeline
+
+# בדיקה
+python3 --version          # צריך 3.12+
+npm run dev:pipeline       # שרת על :8090
+curl http://127.0.0.1:8090/health
+```
+
+אם `python: not found` — השתמש ב-`python3`, לא `python`.  
+אם `venv` נכשל — `npm run setup:pipeline` משתמש ב-`pip install --user` (עובד בלי sudo).
+
+---
+
 ## שלב 0 — בדיקה בלי חומרה (SIM)
 
 אפשר לבדוק את **כל המערכת** בלי קופסה:

@@ -119,9 +119,11 @@
 הוסף ל-`.env` בשורש המונורפו (וב-VPS של orchestrator):
 
 ```env
+TELEPHONY_MODE=retell
 RETELL_API_KEY=key_...
 RETELL_AGENT_ID=agent_...
 RETELL_FROM_NUMBER=+972XXXXXXXXX   # בדיוק המספר שמיובא ב-Retell
+RETELL_ANALYSIS_WAIT_MS=45000      # המתנה ל-post-call analysis אחרי ended
 CALLER_ID=+972XXXXXXXXX            # יכול להיות זהה
 ORCHESTRATOR_URL=http://localhost:8080
 NEXT_PUBLIC_ORCHESTRATOR_URL=http://localhost:8080
@@ -132,10 +134,13 @@ SUPABASE_SERVICE_ROLE_KEY=...
 PHONE_HASH_SECRET=...
 ```
 
+- [ ] סנכרן שדות analysis לסוכן: `npm run retell:sync-analysis` (או `-- --dry-run`)
+- [ ] בדיקת מוכנות (בלי חיוג): `npm run smoke:retell`
+- [ ] חיוג בדיקה אליך: `RETELL_SMOKE_TO=+972... npm run smoke:retell`
 - [ ] הרץ orchestrator: `npm run dev:orchestrator`
 - [ ] בדוק: `curl http://localhost:8080/health`
-  - מצפה: `{ "ok": true, "retell": true, "telephony": "voip_sip" }`
-- [ ] אם `retell: false` — חסר אחד מ-`RETELL_API_KEY` / `AGENT_ID` / `FROM_NUMBER`
+  - מצפה: `{ "ok": true, "telephonyMode": "retell", "telephonyReady": true, "telephony": "voip_sip" }`
+- [ ] אם `telephonyReady: false` — חסר אחד מ-`RETELL_API_KEY` / `AGENT_ID` / `FROM_NUMBER`
 
 ### E2. שיחה ראשונה דרך הפאנל
 - [ ] `npm run dev:web`

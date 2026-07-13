@@ -104,6 +104,12 @@ export class SequentialRunController {
           compiled,
           aiDisclosed: disclose,
           maxDurationSec: campaign.maxCallDurationSec,
+          dynamicVariables: {
+            ...(lead.firstName ? { first_name: lead.firstName } : {}),
+            ...Object.fromEntries(
+              Object.entries(lead.fields).map(([k, v]) => [k, String(v)]),
+            ),
+          },
         });
       } catch {
         await repo.finishCallAttempt(attempt.id, { state: "failed", endReason: "failed", durationSec: 0 });

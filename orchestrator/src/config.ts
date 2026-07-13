@@ -10,6 +10,7 @@ export interface RetellConfig {
   fromNumber: string;
   pollIntervalMs?: number;
   maxPollMs?: number;
+  analysisWaitMs?: number;
 }
 
 export interface PipelineConfig {
@@ -67,6 +68,9 @@ export function loadConfig(): OrchestratorConfig {
             : undefined,
           maxPollMs: process.env.RETELL_MAX_POLL_MS
             ? Number(process.env.RETELL_MAX_POLL_MS)
+            : undefined,
+          analysisWaitMs: process.env.RETELL_ANALYSIS_WAIT_MS
+            ? Number(process.env.RETELL_ANALYSIS_WAIT_MS)
             : undefined,
         }
       : undefined;

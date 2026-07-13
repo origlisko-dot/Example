@@ -13,6 +13,8 @@ export interface DialRequest {
   /** snapshot of the disclosure toggle for this call (audit) */
   aiDisclosed: boolean;
   maxDurationSec: number;
+  /** Extra Retell/Pipecat dynamic vars (e.g. first_name). */
+  dynamicVariables?: Record<string, string>;
 }
 
 export type CallEndReason =

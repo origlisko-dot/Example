@@ -21,6 +21,7 @@ export function createTelephonyProvider(cfg: OrchestratorConfig): TelephonyProvi
       agentId: r.agentId,
       pollIntervalMs: r.pollIntervalMs,
       maxPollMs: r.maxPollMs,
+      analysisWaitMs: r.analysisWaitMs,
     });
   }
 

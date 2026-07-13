@@ -192,8 +192,15 @@ POST /run/:runId
 
 | קובץ | שינוי |
 |------|--------|
-| `orchestrator/src/providers/retellProvider.ts` | map `custom_analysis_data` → `structured`; fallback אם חסר |
-| `orchestrator/src/scripts/retellSyncAnalysis.ts` (חדש, אופציונלי) | סקרipt לייצוא schema ל-Retell API |
+| `orchestrator/src/providers/retellAnalysis.ts` | map schema ↔ Retell + fallback מ-built-ins |
+| `orchestrator/src/providers/retellProvider.ts` | המתנה ל-analysis אחרי ended; dynamic vars |
+| `orchestrator/src/scripts/retellSyncAnalysis.ts` | PATCH agent `post_call_analysis_data` |
+| `npm run smoke:retell` | בדיקת מוכנות / חיוג אופציונלי |
+
+- [x] `custom_analysis_data` → structured + fallback (summary/sentiment/voicemail)
+- [x] `mapRetellDisconnection` לפי enum הרשמי של Retell
+- [x] `retell:sync-analysis` — סנכרון SAMPLE_CAMPAIGN לסוכן
+- [x] tests — `retellAnalysis.test.ts`
 
 **Definition of Done:** `classifyDisposition` מקבל structured מלא; outcomes ב-DB תואמים סימולציה.
 
@@ -337,5 +344,6 @@ CALLER_ID=+972...          # מספר הסים
 |--------|-----|--------|
 | 2026-07-12 | ראשון | Plan 001: מימוש קוד (Retell wiring, POST /run, web trigger, DB pause) |
 | 2026-07-12 | ראשון | Plan 001b: טלפוניה מקבילה — `TELEPHONY_MODE`, GSM pipeline, `dial_server.py` |
+| 2026-07-13 | שני | Plan 001 שלב 6: Retell analysis mapping, sync script, smoke:retell |
 | 2026-07-12 | ראשון | שלב 1: `docs/TWILIO_RETELL_SETUP.md` — checklist Twilio BYOC |
 | 2026-07-12 | ראשון | `docs/GSM_SETUP.md` — מסלול SIM/GSM |

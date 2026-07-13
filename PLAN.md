@@ -270,7 +270,8 @@ orchestrator → GsmPipelineProvider → pipeline/dial_server.py
 - [ ] קניית GSM gateway + הכנסת SIM
 - [ ] Asterisk + PJSIP endpoint (`GSM_GATEWAY_ENDPOINT`)
 - [ ] `PIPELINE_MODE=asterisk` + `ASTERISK_ARI_*`
-- [ ] Pipecat audio bridge (Stasis → `agent.py`) — שיחה קולית אמיתית
+- [x] Call context + bridge seams (`call_context.py`, `bridge.py`) — `PIPECAT_TRANSPORT=bridge_sim|external_media`
+- [ ] RTP/AudioSocket consumer אמיתי ב-Pipecat על `PIPECAT_EXTERNAL_HOST`
 
 ### Env (GSM)
 

@@ -14,8 +14,6 @@ Endpoints:
 from __future__ import annotations
 
 import asyncio
-import base64
-import json
 import os
 import uuid
 from dataclasses import dataclass, field
@@ -26,6 +24,9 @@ import httpx
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+
+from call_context import write_call_context
+from bridge import ari_basic_auth, on_call_answered, transport_mode
 
 load_dotenv()
 
@@ -100,6 +101,7 @@ def health() -> dict[str, Any]:
     return {
         "ok": True,
         "mode": pipeline_mode(),
+        "pipecat_transport": transport_mode(),
         "asterisk_configured": bool(os.environ.get("ASTERISK_ARI_URL")),
     }
 
@@ -114,6 +116,9 @@ async def dial(body: DialBody) -> dict[str, str]:
         compiled=body.compiled,
     )
     _calls[call_id] = record
+    # Always materialize agent context up-front (graph seam: orchestrator → agent.py)
+    ctx_path = write_call_context(body.compiled, call_id)
+    record.structured = {"call_context_path": str(ctx_path)}
 
     mode = pipeline_mode()
     if mode == "asterisk":
@@ -166,11 +171,20 @@ async def _run_sim_call(record: CallRecord) -> None:
         return
 
     record.status = "ongoing"
+    # Optional: exercise bridge_sim path even without Asterisk
+    if transport_mode() == "bridge_sim":
+        await on_call_answered(record, record.compiled)
+        record.status = "ended"
+        record.duration_sec = int(
+            (datetime.now(timezone.utc) - record.started_at).total_seconds()
+        )
+        return
+
     await asyncio.sleep(3)
     record.status = "ended"
     record.end_reason = "answered"
     record.duration_sec = 95
-    record.structured = {**payload, "simulated": True}
+    record.structured = {**(record.structured or {}), **payload, "simulated": True}
     record.transcript = [
         {"speaker": "bot", "text": "שלום, פנית אלינו וביקשת שנחזור אליך."},
         {"speaker": "user", "text": "כן, נכון."},
@@ -188,11 +202,10 @@ async def _run_asterisk_call(record: CallRecord, max_duration_sec: int) -> None:
     password = os.environ.get("ASTERISK_ARI_PASSWORD", "")
     app_name = os.environ.get("ASTERISK_STASIS_APP", "pelozen")
     gateway = os.environ.get("GSM_GATEWAY_ENDPOINT", os.environ.get("SIP_USERNAME", "gsm"))
+    auth = ari_basic_auth(user, password)
 
-    # Dial through GSM gateway PJSIP endpoint — number without + for many gateways
     dest = record.to_e164.lstrip("+")
     endpoint = f"PJSIP/{gateway}/{dest}"
-    auth = base64.b64encode(f"{user}:{password}".encode()).decode()
 
     try:
         async with httpx.AsyncClient(timeout=30) as client:
@@ -209,6 +222,7 @@ async def _run_asterisk_call(record: CallRecord, max_duration_sec: int) -> None:
             record.channel_id = data.get("id")
             record.status = "ongoing"
 
+            answered = False
             deadline = asyncio.get_event_loop().time() + max_duration_sec
             while asyncio.get_event_loop().time() < deadline:
                 ch = await client.get(
@@ -220,8 +234,16 @@ async def _run_asterisk_call(record: CallRecord, max_duration_sec: int) -> None:
                 state = ch.json().get("state")
                 if state in ("Down", "Rsrvd"):
                     break
-                if state == "Up":
+                if state == "Up" and not answered:
+                    answered = True
                     record.end_reason = "answered"
+                    await on_call_answered(
+                        record,
+                        record.compiled,
+                        ari_client=client,
+                        ari_auth=auth,
+                        ari_url=ari_url,
+                    )
                 await asyncio.sleep(2)
 
             if record.channel_id:
@@ -236,8 +258,11 @@ async def _run_asterisk_call(record: CallRecord, max_duration_sec: int) -> None:
             record.duration_sec = int(
                 (datetime.now(timezone.utc) - record.started_at).total_seconds()
             )
-            # Pipecat audio bridge (Stasis → agent.py) is wired separately.
-            record.structured = record.structured or {"note": "asterisk_originate_only"}
+            if not record.structured.get("disposition") and not record.structured.get("bridge_sim"):
+                record.structured = {
+                    **(record.structured or {}),
+                    "note": "asterisk_originate_bridge_pending",
+                }
     except httpx.HTTPError as e:
         record.status = "error"
         record.end_reason = f"ari_failed:{e}"

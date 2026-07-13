@@ -83,6 +83,8 @@ shared
 | — | 20 tests pass | orchestrator | + telephonyStatus |
 | 2026-07-13 | שני | `python3` + `setup:pipeline` | Linux: אין `python`; pip --user בלי sudo |
 | 2026-07-13 | שני | `smoke:gsm` + POST /smoke/gsm | e2e MemoryRepo→GsmPipeline→dial_server sim | dialed=2 qualified=1 |
+| 2026-07-13 | שני | graphify + code-review-graph | 639 / 290 nodes | כלי ניתוח קוד |
+| 2026-07-13 | שני | Pipecat bridge seams | `call_context.py`, `bridge.py` | תפר Stasis→agent; bridge_sim עובד |
 
 ---
 
@@ -155,6 +157,8 @@ shared
 - [ ] Pipecat audio bridge (Stasis → agent.py)
 - [x] `TELEPHONY_MODE` + GSM pipeline code
 - [x] smoke:gsm e2e (MemoryRepo, closed env)
+- [x] Pipecat bridge seams + bridge_sim
+- [ ] RTP transport אמיתי ל-agent.py
 - [x] `telephonyFactory.ts` + `orchestratorApp.ts`
 - [x] `server.ts` — POST `/run/:runId` + mode-aware health
 - [x] `run.ts` — trigger orchestrator after startRun + resume

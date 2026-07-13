@@ -125,7 +125,21 @@ npm run dev:web
 
 ## מה עדיין ב-build
 
-- [ ] Pipecat audio bridge (Stasis → `agent.py`) — שיחה עם קול Cartesia דרך GSM
-- [ ] Asterisk originate עובד; voice bridge = השלב הבא
+- [x] Call context JSON לכל dial (`call_context.py`) — תפר orchestrator → agent
+- [x] `bridge.py` — `PIPECAT_TRANSPORT=none|bridge_sim|external_media`
+- [ ] RTP/AudioSocket consumer בתוך Pipecat (transport אמיתי על `PIPECAT_EXTERNAL_HOST`)
+- [ ] Asterisk originate + ExternalMedia על חומרה אמיתית
+
+### בדיקת גשר בלי חומרה
+
+```bash
+# ב-.env של pipeline / root:
+PIPECAT_TRANSPORT=bridge_sim
+
+# restart pipeline, then:
+curl -X POST http://127.0.0.1:8090/dial -H 'content-type: application/json' \
+  -d '{"to_e164":"+972501234567","caller_id":"+972501111111","compiled":{"systemPrompt":"שלום"}}'
+# אחרי ~3s — GET /calls/{id} עם bridge_sim + disposition
+```
 
 ראה גם: [`TELEPHONY_OPTIONS_IL.md`](./TELEPHONY_OPTIONS_IL.md)

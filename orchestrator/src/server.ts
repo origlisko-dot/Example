@@ -1,22 +1,28 @@
-import { createServer, type IncomingMessage } from "node:http";
+import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { createClient } from "@supabase/supabase-js";
-import { loadConfig } from "./config.js";
 import { PelozenScraperSource } from "./leadSource/pelozenScraperSource.js";
 import { ingestLeads } from "./leadIngest.js";
+import { executeRun, RunNotFoundError, RunNotRunnableError } from "./runWorker.js";
+import type { OrchestratorBundle } from "./orchestratorApp.js";
+import { runGsmSmoke } from "./smoke/runGsmSmoke.js";
 
 /**
- * Minimal HTTP surface for the panel. One real endpoint today — POST /scrape —
- * which scrapes a pelozen topic and ingests the leads. The dialer/run endpoints
- * will join this server later. Uses Node's built-in http (no framework dep).
+ * HTTP surface for the panel:
+ *   GET  /health
+ *   POST /scrape
+ *   POST /run/:runId   — start/resume the sequential dial loop (async)
+ *   POST /smoke/gsm    — closed-env GSM e2e (MemoryRepo, no Supabase); SMOKE_ENDPOINTS=1
  */
-export function startServer() {
-  const cfg = loadConfig();
+export function startServer(orchestrator: OrchestratorBundle) {
+  const { cfg, controller } = orchestrator;
   const db = createClient(cfg.supabaseUrl, cfg.supabaseServiceRoleKey, { auth: { persistSession: false } });
   const scraper = new PelozenScraperSource({
     username: process.env.PELOZEN_USERNAME ?? "",
     password: process.env.PELOZEN_PASSWORD ?? "",
     storageStatePath: ".pelozen-session.json",
   });
+
+  const activeRuns = new Set<string>();
 
   const server = createServer(async (req, res) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
@@ -26,7 +32,17 @@ export function startServer() {
     if (req.method === "OPTIONS") { res.writeHead(204); res.end(); return; }
 
     if (req.method === "GET" && req.url === "/health") {
-      json(res, 200, { ok: true });
+      const ts = orchestrator.telephonyStatus;
+      json(res, 200, {
+        ok: true,
+        telephonyMode: ts.mode,
+        telephonyReady: ts.ready,
+        telephony: orchestrator.telephony.kind,
+        retellConfigured: ts.retellConfigured,
+        gsmConfigured: ts.gsmConfigured,
+        pipelineUrl: ts.pipelineUrl,
+        hint: ts.hint,
+      });
       return;
     }
 
@@ -49,14 +65,77 @@ export function startServer() {
       return;
     }
 
+    if (req.method === "POST" && req.url === "/smoke/gsm") {
+      if (process.env.SMOKE_ENDPOINTS !== "1") {
+        json(res, 403, { error: "Set SMOKE_ENDPOINTS=1 to enable closed-env smoke" });
+        return;
+      }
+      const ts = orchestrator.telephonyStatus;
+      if (ts.mode !== "gsm" || !ts.ready) {
+        json(res, 503, { error: "GSM telephony not ready", status: ts });
+        return;
+      }
+      try {
+        const body = await readJson(req);
+        const leadCount = Math.min(Number(body.leadCount) || 2, 5);
+        const result = await runGsmSmoke(orchestrator.telephony, {
+          callerId: cfg.callerId,
+          phoneHashSecret: cfg.phoneHashSecret,
+          leadCount,
+        });
+        json(res, 200, result);
+      } catch (e) {
+        json(res, 500, { error: (e as Error).message });
+      }
+      return;
+    }
+
+    const runMatch = req.method === "POST" && req.url?.match(/^\/run\/([0-9a-f-]{36})$/i);
+    if (runMatch) {
+      const runId = runMatch[1]!;
+
+      const ts = orchestrator.telephonyStatus;
+      if (!ts.ready) {
+        json(res, 503, {
+          error: ts.hint ?? "Telephony not configured",
+          mode: ts.mode,
+        });
+        return;
+      }
+
+      if (activeRuns.has(runId)) {
+        json(res, 409, { error: "Run already in progress", runId });
+        return;
+      }
+
+      activeRuns.add(runId);
+      json(res, 202, { accepted: true, runId });
+
+      void executeRun(cfg, controller, runId)
+        .then((summary) => console.log(`run ${runId} finished:`, summary))
+        .catch((e) => {
+          if (e instanceof RunNotFoundError) console.error(e.message);
+          else if (e instanceof RunNotRunnableError) console.warn(e.message);
+          else console.error(`run ${runId} failed:`, e);
+        })
+        .finally(() => activeRuns.delete(runId));
+
+      return;
+    }
+
     res.writeHead(404); res.end("not found");
   });
 
-  server.listen(cfg.port, () => console.log(`orchestrator http listening on :${cfg.port}`));
+  server.listen(cfg.port, () => {
+    const ts = orchestrator.telephonyStatus;
+    console.log(
+      `orchestrator http listening on :${cfg.port} (mode=${ts.mode}, ready=${ts.ready})`,
+    );
+  });
   return server;
 }
 
-function json(res: import("node:http").ServerResponse, status: number, body: unknown): void {
+function json(res: ServerResponse, status: number, body: unknown): void {
   res.writeHead(status, { "content-type": "application/json; charset=utf-8" });
   res.end(JSON.stringify(body));
 }

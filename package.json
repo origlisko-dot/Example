@@ -12,7 +12,12 @@
     "build": "npm run build --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "dev:orchestrator": "npm run dev --workspace orchestrator",
-    "dev:web": "npm run dev --workspace web"
+    "dev:web": "npm run dev --workspace web",
+    "setup:pipeline": "python3 -m pip install --user -r pipeline/requirements.txt",
+    "dev:pipeline": "python3 pipeline/dial_server.py",
+    "smoke:gsm": "npm run smoke:gsm --workspace orchestrator",
+    "smoke:retell": "npm run smoke:retell --workspace orchestrator",
+    "retell:sync-analysis": "npm run retell:sync-analysis --workspace orchestrator"
   },
   "engines": {
     "node": ">=20"

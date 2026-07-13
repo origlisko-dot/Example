@@ -13,6 +13,8 @@ export interface DialRequest {
   /** snapshot of the disclosure toggle for this call (audit) */
   aiDisclosed: boolean;
   maxDurationSec: number;
+  /** Extra Retell/Pipecat dynamic vars (e.g. first_name). */
+  dynamicVariables?: Record<string, string>;
 }
 
 export type CallEndReason =
@@ -34,26 +36,5 @@ export interface DialResult {
 
 export interface TelephonyProvider {
   readonly kind: "asterisk_gsm" | "voip_sip";
-  /**
-   * Place ONE outbound call and resolve when it ends. With Pipecat the audio is
-   * bridged into the voice pipeline, which fills `structured` via record_outcome.
-   * Because we run a single line, the orchestrator awaits this sequentially.
-   */
   dial(req: DialRequest): Promise<DialResult>;
-}
-
-/**
- * Stub Asterisk/GSM provider. Real implementation (build-day) uses ARI
- * `channels.originate` to the gateway endpoint, parks the answered channel into
- * a Stasis app that connects the Pipecat bot, and waits for the bot to report
- * the outcome (DB row / webhook) before resolving.
- */
-export class AsteriskGsmProvider implements TelephonyProvider {
-  readonly kind = "asterisk_gsm" as const;
-  constructor(private readonly config: { ariUrl: string; gatewayEndpoint: string }) {}
-
-  async dial(_req: DialRequest): Promise<DialResult> {
-    void this.config;
-    throw new Error("AsteriskGsmProvider.dial not implemented until build-day wiring");
-  }
 }

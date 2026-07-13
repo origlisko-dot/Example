@@ -137,11 +137,31 @@ async def report_outcome(ctx: dict, captured: dict, task: PipelineTask) -> None:
 
 
 def main() -> None:
-    # TODO(build-day): construct the real transport (Asterisk websocket bridge or
-    # LiveKit/Daily SIP) and pass it to run_call. Until then this is the shape.
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Pelozen Pipecat voice agent")
+    parser.add_argument(
+        "--context",
+        default=os.environ.get("PELOZEN_CALL_CONTEXT"),
+        help="Path to call context JSON (from dial_server / bridge)",
+    )
+    args = parser.parse_args()
+    if args.context:
+        os.environ["PELOZEN_CALL_CONTEXT"] = args.context
+
+    transport_kind = os.environ.get("PIPECAT_TRANSPORT", "none").lower()
+    if transport_kind in ("none", "bridge_sim"):
+        raise SystemExit(
+            "agent.py needs a live audio transport (PIPECAT_TRANSPORT=external_media "
+            "and a Pipecat transport listening on PIPECAT_EXTERNAL_HOST). "
+            "Context path is ready when dial_server writes PELOZEN_CALL_CONTEXT."
+        )
+
+    # TODO(build-day): construct the real transport (Asterisk ExternalMedia /
+    # AudioSocket websocket, or LiveKit/Daily SIP) and pass it to run_call.
     raise SystemExit(
-        "Configure the telephony transport (build-day) before running agent.py. "
-        "See file header."
+        "Configure the telephony transport before running agent.py. "
+        "See pipeline/bridge.py and docs/GSM_SETUP.md."
     )
 
 

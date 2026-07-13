@@ -14,10 +14,26 @@ natural barge-in.
    orchestrator webhook. No audio is stored (recording OFF by default).
 
 ## Setup
+
+**Linux / cloud (no sudo):**
+
 ```bash
-python -m venv .venv && source .venv/bin/activate   # (Windows: .venv\Scripts\activate)
+npm run setup:pipeline    # pip install --user -r requirements.txt
+python3 --version         # 3.12+ — use python3, not python
+```
+
+**Local dev with venv (optional):**
+
+```bash
+python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env   # fill keys + the owner's CARTESIA_VOICE_ID
+```
+
+**Run dial service (GSM path):**
+
+```bash
+npm run dev:pipeline      # python3 pipeline/dial_server.py → :8090
 ```
 
 ## Build-day TODOs (marked in agent.py)

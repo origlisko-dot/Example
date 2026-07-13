@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>The Last Body at Vale House — Player (extended cut)</title>
+<style>
+  html,body{margin:0;height:100%;background:#000;color:#caa46a;font-family:Georgia,'Times New Roman',serif;}
+  #stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#000;}
+  video,img#frame{max-width:100%;max-height:100%;width:auto;height:auto;}
+  #cap{position:fixed;left:0;right:0;bottom:6%;text-align:center;font-size:clamp(15px,2.4vw,24px);
+       color:#e7dcc4;text-shadow:0 2px 10px #000,0 0 2px #000;letter-spacing:.5px;padding:0 8%;}
+  #start{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+         background:radial-gradient(ellipse at center,#0c1413,#000);cursor:pointer;z-index:10;text-align:center;}
+  #start h1{font-size:clamp(26px,5vw,56px);letter-spacing:3px;color:#bfae8e;margin:0 0 .3em;}
+  #start p{color:#6f7d79;letter-spacing:2px;text-transform:uppercase;font-size:13px;}
+  #start .play{margin-top:28px;border:1px solid #6f7d79;border-radius:50%;width:84px;height:84px;
+       display:flex;align-items:center;justify-content:center;font-size:30px;color:#caa46a;}
+  #prog{position:fixed;top:0;left:0;height:3px;background:#7d2b2b;width:0;z-index:20;transition:width .2s linear;}
+  #hud{position:fixed;top:10px;right:14px;font-size:12px;color:#5c6764;letter-spacing:1px;z-index:20;}
+  #card{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:#000;z-index:5;}
+  #card img{max-width:100%;max-height:100%;}
+</style>
+</head>
+<body>
+<div id="prog"></div><div id="hud"></div>
+<div id="stage"><video id="vid" playsinline></video><img id="frame" style="display:none"/></div>
+<div id="cap"></div>
+<div id="card"><img id="endimg"/></div>
+<audio id="music" src="music.mp3" loop></audio>
+<div id="start">
+  <h1>THE LAST BODY<br/>AT VALE HOUSE</h1>
+  <p>Extended cut · 53 shots · ~4m26s · headphones recommended</p>
+  <div class="play">▶</div>
+  <p style="margin-top:26px;color:#4a5350">click to begin</p>
+</div>
+<script>
+const B="https://d8j0ntlcm91z4.cloudfront.net/user_3F1O6weMRqXr9LfttZOeEzhHpcP/hf_20260627_";
+const END=B+"225147_869c3a21-6c3b-4c9f-ab72-190c2cea7cc5.png";
+const A=t=>B+t+".mp3";
+const DLG={
+ d03:A("231909_f0925e8c-ef3f-43bb-ab31-9982b06b9b08"),d07:A("231912_b67ec6fc-83e2-4aad-9998-d1f471ce4a59"),
+ d08:A("231919_b9637617-345e-4b3a-91ae-c340f6c79f72"),d09:A("231921_de4139de-4278-4a5d-8048-bcf693539f15"),
+ d10a:A("231924_3e92e17e-b05e-403b-8f9f-b7c1772d58f7"),d10b:A("231926_bbbb6233-08e8-46a1-ba60-005e51eec0f2"),
+ d11:A("231929_a2107d73-315e-4d16-9bc1-ed84e2067352"),d12:A("231932_47113b23-1935-412f-9703-aec6f1f186f5"),
+ d13:A("231935_8270a0db-9988-4b77-a98c-8e6a2609d2e0"),d14:A("231937_1c562b16-aa8b-4024-b81b-c1e07efa6832"),
+ d15:A("231939_6d464c54-24cb-4291-b049-94bdc43c1882"),d16:A("231942_26fe6a0e-dd23-4d30-b7f8-02c4528d0ce0"),
+ d17:A("231944_3db34da9-e211-4630-bb11-c7447a8db20e"),d19:A("231946_05250cf0-e84b-4953-871c-525055293dbf"),
+ d20:A("231949_6ea2cc55-dd66-421c-9f9e-68083593fca3"),vo5:A("205201_9b652ef3-e6a8-49d1-bc27-8d0da1bdc60d"),
+ vo6:A("205204_ceed05b1-4b3f-4511-8754-77ce3536a23a")};
+// [type 'v'|'i', time_uuid, caption, [ [dlgKey,delayMs] ... ]]
+const SH=[
+ ["v","204907_b1265fde-d53f-4f06-9327-24d0ec38d0d4","The body arrived during a thunderstorm."],
+ ["v","233924_1da2512f-2cef-46f6-b299-5ed9977fc265","A county van. Red taillights in the rain."],
+ ["v","233926_31539437-ef56-4793-ae06-88ed011ebe65","The driver will not come inside."],
+ ["v","204942_6aabb4e6-a0fe-4fcd-9785-be7d163dcad0","DRIVER: “…Don’t leave her face uncovered.”",[["d03",300]]],
+ ["v","204911_6ab22940-0496-4727-ac86-15ecffa62cba","Under the sheet — a click, like teeth."],
+ ["v","233928_b8c4ec99-f208-47ce-aff6-fe802f739a40","She pulls the body in from the storm."],
+ ["v","233931_38be24a5-bc38-4dbe-a7a0-a6c17d8aa243","The prep room is colder than usual."],
+ ["v","204944_64dfea10-f2df-4166-bfdd-5b2f8c2ad4f7","She draws back the sheet."],
+ ["i","204349_76a63fde-7066-40e1-814c-5605964c5cf2","Clasped hands. A red thread."],
+ ["v","204916_ddc7bafb-47a7-463c-9e1e-a1b8517b91b2","The fingers open. The mirror falls."],
+ ["i","204353_0eccd609-e200-40a7-b505-344c21f01024","GIVE HIM BLOOD."],
+ ["v","204918_70dace8c-cd0f-48df-8276-f0c8485825a6","The lights flicker."],
+ ["v","233933_1e517216-6da6-487f-9585-9a1bb4b308ca","Daniel, barefoot, staring at the wall."],
+ ["i","204418_363764ad-166b-435f-9c7f-f0f4142cce23","A symbol carved in the plaster."],
+ ["v","204919_84706fe8-5aec-47fd-b1fc-e17e79e7123d","DANIEL: “You brought something in.”",[["d07",600]]],
+ ["v","233935_a577f740-d588-4587-9dc4-de332318a980","A whisper in her father’s voice. She runs."],
+ ["v","204947_22e264fd-6e2c-4936-a86b-24583fe9bace","The hallway is longer than it was."],
+ ["v","233937_54db33e7-e24a-4af6-bd2e-131d68119c97","She sets the mirror on the table."],
+ ["v","233940_4395e1c1-df58-43bf-8a7d-817debae4c75","DANIEL: “Mom had one.”"],
+ ["v","204949_a657823c-dfb6-4bb7-bc74-e361e5c2b23d","MARA: “Is someone there?”",[["d09",1000]]],
+ ["v","205222_58ce1512-abaf-4ff3-b400-13f72a679604","“Our brother.” — “We never had a brother.”",[["d10a",200],["d10b",2200]]],
+ ["v","233942_32e77fd7-6cf1-476e-b04e-fe1c7f2d488a","Below — every drawer slides open."],
+ ["v","233943_1c7328de-ed99-4b42-8e0f-34a0534c8e66","ELIAS: “A door pretending to be glass.”",[["d08",400]]],
+ ["v","233956_ac6ef5a5-ee5b-4d9c-9325-567b016e1202","DANIEL: “Our father, who art in heaven…”",[["d11",400]]],
+ ["v","204954_e5e63243-bc39-42ae-b4e9-da27704274ea","THE THING: “She gave him blood.”",[["d12",300]]],
+ ["v","204956_5f923ef0-b498-4744-8657-a7f6296e2aaf","He drives his head into the refrigerator."],
+ ["v","233958_059d5c8f-3bc7-4ba2-acaf-408edd093d28","The priest comes through the storm."],
+ ["v","204958_82364eba-e869-41dd-b7a3-c90a5d87b804","ELIAS: “That is the invitation.”",[["d13",300]]],
+ ["v","234000_55b702c1-d416-42ea-80aa-28c79c094fe7","Bound to the chair. Three voices."],
+ ["i","204530_eb9f4c86-77d8-4253-806c-c762e4660976","FOR MARA, WHEN THE HOUSE WAKES."],
+ ["i","204533_fc9ce440-4a66-4d92-91cd-46c69e5aa743","A family of four. “Samuel was the price.”"],
+ ["v","205000_780e299a-84d8-4227-818c-111fb621ed93","THE THING: “Not in. Under.”",[["d14",400]]],
+ ["v","205020_0ce83d19-6bdd-4070-9042-af417afdca69","ELIAS: “Now it is hungry again.”",[["d15",300]]],
+ ["v","234002_0406a403-e5cd-4850-a9e2-45029be8bb2a","The chained cabinet."],
+ ["v","234005_db92a406-3dff-4092-a56e-e29d5c30f26e","Not chemicals — photographs."],
+ ["i","204613_2fd5c368-df5d-4998-b7ca-1cd2ea1d03c8","FATHER (tape): “…We chose.”",[["d16",200]]],
+ ["v","205022_257e7d91-d912-4b0f-96e0-330c22122f23","The choice, in candlelight."],
+ ["v","205024_a9e3f5f2-8ea5-448a-bf36-f556d664cd9b","The wall cracks open."],
+ ["v","234008_807857cb-69aa-4115-b6bc-a77af61fe295","The rite begins."],
+ ["v","205026_98ed7fc4-9b7d-46e8-9226-922ec476bc15","THE THING: “I preserved you.”",[["d17",500]]],
+ ["v","205029_80b37dd8-2f7c-4d97-a94f-2dac5ba7ad4b","“You live because I was fed.”",[["d19",300]]],
+ ["v","205030_b03cdd84-0973-4b43-88c2-a702fe6f6bc6","“Then feed me another.”",[["d20",300]]],
+ ["v","234010_9d4ca087-de0f-4fd8-bc1f-786a7cba14bf","The crucifix to his brow. Smoke."],
+ ["v","205033_5058def9-26f4-4601-abba-0fa3cc902275","MARA: “We live because he died.”",[["vo5",400]]],
+ ["v","234012_c0b227f8-5f52-4186-9ed6-f2e16eff2c91","Dawn. Three survivors."],
+ ["v","205035_9c6b5a33-b1a2-4cdf-ae46-50d99a23a26f","A month later, the machines come."],
+ ["v","205037_4049b53a-9d7d-4221-b35b-e2bc9c7cc6e3","Thirty-seven. Most of them infants."],
+ ["i","204647_26de7a51-08cc-49fd-82b2-256d7f28ec55","A blue blanket. ‘Samuel.’"],
+ ["v","234015_ec36ba4f-4148-454c-9d4d-13ae59ec5d71","She buries him."],
+ ["v","205040_ae2311ab-f672-4921-a8c1-614afcd00cd9","She does not pray."],
+ ["v","234017_73cbd4f6-0112-46e0-a6c6-608af8430c26","A package. No address. No postage."],
+ ["i","204656_0aeae50f-932c-473c-a09f-3e50a6489f59","‘It was never the mirror.’"],
+ ["v","205100_ac992d7e-08e4-4e82-9165-be8483c0c622","REFLECTION: “Your brother still owes me.”",[["vo6",300]]],
+];
+const vid=document.getElementById('vid'),frame=document.getElementById('frame'),cap=document.getElementById('cap'),
+      prog=document.getElementById('prog'),hud=document.getElementById('hud'),startEl=document.getElementById('start'),
+      music=document.getElementById('music'),card=document.getElementById('card'),endimg=document.getElementById('endimg');
+let i=0,active=[],timer=null;
+function clearVoices(){active.forEach(a=>{try{a.pause()}catch(e){}});active=[];if(timer){clearTimeout(timer);timer=null;}}
+function fireDlg(sh){const d=sh[3];if(!d)return;d.forEach(([k,ms])=>{const a=new Audio(DLG[k]);active.push(a);
+  setTimeout(()=>{a.play().catch(()=>{});},ms);});}
+function show(idx){
+  if(idx>=SH.length)return finish();
+  i=idx;hud.textContent="Shot "+(idx+1)+" / "+SH.length;prog.style.width=(idx/SH.length*100)+"%";
+  const sh=SH[idx];cap.textContent=sh[2];clearVoices();fireDlg(sh);
+  if(sh[0]==="i"){ vid.style.display="none";frame.style.display="";frame.src=B+sh[1]+".png";
+    timer=setTimeout(()=>show(i+1),3500);
+  } else { frame.style.display="none";vid.style.display="";vid.src=B+sh[1]+".mp4";vid.play().catch(()=>{}); }
+}
+vid.addEventListener('ended',()=>show(i+1));
+vid.addEventListener('error',()=>show(i+1));
+function finish(){prog.style.width="100%";vid.style.display="none";frame.style.display="none";cap.textContent="";
+  endimg.src=END;card.style.display="flex";hud.textContent="";clearVoices();
+  let v=music.volume;const f=setInterval(()=>{v-=0.05;if(v<=0){music.pause();clearInterval(f);}else music.volume=v;},150);}
+startEl.addEventListener('click',()=>{startEl.style.display="none";music.volume=0.32;music.play().catch(()=>{});show(0);});
+</script>
+</body>
+</html>

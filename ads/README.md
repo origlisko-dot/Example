@@ -20,6 +20,7 @@ to anchor each creative to the real garment.
 **1. White crystal set** — headline "לבן. נוצץ. בלתי נשכח." / "עכשיו ב-YSTYLE TLV"
 - https://d8j0ntlcm91z4.cloudfront.net/user_3F1O6weMRqXr9LfttZOeEzhHpcP/hf_20260615_112943_26500f1a-8814-4594-bea6-a05e93a77b4d.png
 - https://d8j0ntlcm91z4.cloudfront.net/user_3F1O6weMRqXr9LfttZOeEzhHpcP/hf_20260615_112943_dfcc781b-1676-4e6a-b858-c93a96d856d0.png
+- (waist-up framing) https://d8j0ntlcm91z4.cloudfront.net/user_3F1O6weMRqXr9LfttZOeEzhHpcP/hf_20260615_114454_56a8416c-3618-4608-b6cc-7851ed0317ca.png
 
 **2. Balloon jeans (5021)** — headline "ג'ינס בלון. הגזרה של העונה." / "דגם 5021 | YSTYLE TLV"
 - https://d8j0ntlcm91z4.cloudfront.net/user_3F1O6weMRqXr9LfttZOeEzhHpcP/hf_20260615_112950_448257dd-617c-4d25-88b8-35ab941bf531.png
@@ -29,13 +30,16 @@ to anchor each creative to the real garment.
 - https://d8j0ntlcm91z4.cloudfront.net/user_3F1O6weMRqXr9LfttZOeEzhHpcP/hf_20260615_112956_2c463738-4791-480c-8041-e225b3f07dfc.png
 - https://d8j0ntlcm91z4.cloudfront.net/user_3F1O6weMRqXr9LfttZOeEzhHpcP/hf_20260615_113032_02ee346e-f677-4c26-b0ce-a1d4b944d17c.png
 
-## Video reels (seedance_2_0, 9:16, 5s) — image-to-video from the real product photos
+## Video reels (9:16, 5s) — image-to-video from the product photos
 
-- White set — job `2634a86b-5dc6-4375-98c9-8b2b1264efdb`
-- Balloon jeans — job `0668a903-f938-439c-a456-0fa861b7053d`
-- Plaid dress — job `bd24d501-23bd-4f1f-a8d7-d6ffb1a88dda`
+- **Balloon jeans** (seedance_2_0): https://d8j0ntlcm91z4.cloudfront.net/user_3F1O6weMRqXr9LfttZOeEzhHpcP/hf_20260615_113102_0668a903-f938-439c-a456-0fa861b7053d.mp4
+- **Plaid dress** (seedance_2_0): https://d8j0ntlcm91z4.cloudfront.net/user_3F1O6weMRqXr9LfttZOeEzhHpcP/hf_20260615_113120_bd24d501-23bd-4f1f-a8d7-d6ffb1a88dda.mp4
+- **White set** (seedance_2_0, waist-up framing): https://d8j0ntlcm91z4.cloudfront.net/user_3F1O6weMRqXr9LfttZOeEzhHpcP/hf_20260615_114632_c0f4aa7a-1264-471a-af4a-619132d3087c.mp4 — earlier full-body attempts were blocked by the content filter due to the bare-leg short-shorts framing, so this uses a waist-up crop.
 
-(Video result URLs added once rendering completes.)
+## Long-form reel (seedance_2_0, 9:16, 10s, with audio)
+
+- **Plaid dress** — walk-in → pose → slow twirl → smile, cinematic push-in:
+  https://d8j0ntlcm91z4.cloudfront.net/user_3F1O6weMRqXr9LfttZOeEzhHpcP/hf_20260615_120211_01f065b0-ab97-4964-bab0-1093083a1eb1.mp4
 
 ## Notes
 

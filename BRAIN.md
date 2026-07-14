@@ -14,7 +14,10 @@
 | DB | ✅ `0001_init.sql` — 12 טבלאות |
 | ליבה נבדקת | 20 unit tests (phone, parse, outcomeEval, runController, telephonyStatus) |
 | טלפוניה | ✅ **שני מסלולים במקביל:** Retell (Port/Twilio) **או** GSM/Pipecat (SIM) — `TELEPHONY_MODE` |
-| שיחה חיה | ⏳ Retell: Twilio BYOC + `RETELL_*` · GSM: קופסה+SIM או `PIPELINE_MODE=sim` ל-dev |
+| שיחה חיה | ⏳ Retell: Twilio/Telnyx BYOC + `RETELL_*` · GSM: קופסה+SIM |
+| מספר בעלים (IL) | `+972545456212` (054-545-6212) — ברירת מחדל ב-`config.ts` / `CALLER_ID` |
+| מספר Retell נוכחי | `+16823421778` (US) — זמני; להחליף אחרי Port של המספר הישראלי |
+| מספר בדיקה (smoke) | `+972586664519` |
 | תוכנית | [`PLAN.md`](./PLAN.md) Plan 001 + 001b — 🟢 קוד / ⏳ תשתית חיצונית |
 
 ---
@@ -85,7 +88,7 @@ shared
 | 2026-07-13 | שני | `smoke:gsm` + POST /smoke/gsm | e2e MemoryRepo→GsmPipeline→dial_server sim | dialed=2 qualified=1 |
 | 2026-07-13 | שני | graphify + code-review-graph | 639 / 290 nodes | כלי ניתוח קוד |
 | 2026-07-13 | שני | Pipecat bridge seams | `call_context.py`, `bridge.py` | תפר Stasis→agent; bridge_sim עובד |
-| 2026-07-13 | שני | Plan 001 שלב 6 Retell | retellAnalysis + sync + smoke:retell | analysis mapping + fallback |
+| 2026-07-14 | שלישי | מספר IL בעלים ב-BRAIN + `.env` | `+972545456212` | שוחזר מזיכרון פרויקט (config default) |
 
 ---
 
@@ -124,7 +127,8 @@ shared
 | `RETELL_AGENT_ID` | RetellProvider | ⏳ env נדרש |
 | `RETELL_FROM_NUMBER` | BYOC from_number | ⏳ env נדרש |
 | `ORCHESTRATOR_URL` | web → POST /run | ⏳ env נדרש |
-| `CALLER_ID` | caller ID לוגי | קיים ב-.env.example |
+| `CALLER_ID` / `OWNER_IL_NUMBER` | מספר הבעלים הישראלי `+972545456212` | ✅ בזיכרון |
+| `RETELL_FROM_NUMBER` | מספר ב-Retell trunk (כרגע US עד Port) | ⏳ |
 
 ---
 
